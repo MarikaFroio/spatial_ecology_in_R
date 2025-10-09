@@ -1,0 +1,37 @@
+#code for estimating population density
+#package in R: spatstat, in CRAN
+#install.packages to install
+#vignettes
+#installing the package
+install.packages("spatstat")
+library(spatstat)
+bei
+plot(bei, pch=15, col="magenta4")
+plot(bei, pch=15, cex=0.5)
+#related to 2 different maps: elevation and gradient
+bei.extra
+plot(bei.extra)
+#if I want to plot just 1 variable, symbol linking variable to extra $
+plot(bei.extra$elev)
+#I can also directly put the number of the variable like 1,2... for first, second
+#[[]] I subset the variable. because we are using raster data (raster comes from aratro, which creates lines?????). 
+plot(bei.extra[[1]])
+plot(bei.extra[[2]])
+
+#link a name to bei.extra with <-. I am creating a new object
+el<-bei.extra[[1]]
+plot(el)
+
+#producing a density map. passing from points (vectors) to  a map (raster)
+beidens<-density(bei)
+plot(beidens)
+
+#plotting the elvation is the opposite of the density
+plot(el)
+
+plot(beidens)
+points(bei)
+plot
+
+#to enter the function
+density
