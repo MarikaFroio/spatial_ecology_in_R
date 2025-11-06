@@ -1,0 +1,11 @@
+#code for performing multivariate analysis with community abundance matrices
+
+#install.packages("vegan")
+library(vegan)
+
+data(dune)
+#to use the dataset called dune
+dune
+#to see the data
+#once i have a huge dataset i can use the function head to represent just the head of the file: the first 6 lines
+head(dune)
