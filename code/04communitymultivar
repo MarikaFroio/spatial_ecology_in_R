@@ -7,5 +7,32 @@ data(dune)
 #to use the dataset called dune
 dune
 #to see the data
+##(last 4 are the species??)
+
+##species abundance matrix
 #once i have a huge dataset i can use the function head to represent just the head of the file: the first 6 lines
 head(dune)
+
+multivar<-decorana(dune)
+
+dca1l<-3.7004
+dca2l<-3.1166
+#l=length
+#we can also use = instead of <-
+dca3l=1.30055
+dca4l=1.47888
+
+#get the percentage of the range detected (explained variability) by ecach axis
+total=dca1l+dca2l+dca3l+dca4l
+#or
+total=sum(c(dca1l, dca2l, dca3l, dca4l))
+
+percdca1=dca1l*100/total
+percdca2=dca2l*100/total
+
+percdca1+percdca2
+
+multipca<-pca(dune)
+
+plot(multivar)
+plot(multipca)
