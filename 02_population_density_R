@@ -21,8 +21,9 @@ bei
 #It is stored as a ppp object (a spatial point pattern).
 
 plot(bei, pch=15, col="magenta4")
-plot(bei, pch=15, cex=0.5)
-#related to 2 different maps: elevation and gradient
+plot(bei, pch=15, cex=0.3)
+#In R, cex is a graphical parameter that controls the size of points, text, or symbols in a plot
+#related to 2 different maps: elevation and gradient. Elevation = height above sea level (or another reference level), Gradient = steepness of the slope (how quickly elevation changes).
 bei.extra
 #In spatstat, bei.extra is an auxiliary dataset that provides environmental covariate rasters associated with the bei point pattern.
 #Typically it includes items such as:elev — elevation raster, grad — slope or gradient, covariate images used to model the point pattern intensity
@@ -43,9 +44,9 @@ plot(el)
 beidens<-density(bei)
 plot(beidens)
 
-#plotting the elvation is the opposite of the density
+#plotting the elvation is the opposite of the density: Density “Where are the seedlings concentrated?”, Elevation “What is the elevation at each location?”.
 plot(el)
-#el<-elevation(bei)??
+#el<-elevation(bei)?? non esiste la funzione elevation
 points(bei)
 #In R, points(bei) (after plotting density or elevation map) is used to add the original point pattern on top of the density map.
 
@@ -61,33 +62,37 @@ el <- bei.extra[[1]]
 
 # one object is dmap and the other is el
 # how to plot the dmap beside el?
+#par(mfrow...) To compare plots side by side
 par(mfrow=c(1,2)) # we will solve this anti-human stuff soon!
-plot(dmap)
+plot(beidens)
 plot(el)
 
 # plot the dmap ontop of the el map
 par(mfrow=c(2,1)) 
-plot(dmap)
+plot(beidens)
 plot(el)
 
 # if you want to close graphical devices this is your friend:
 dev.off()
+dev.new() 
+#opposite
 
 cl <- colorRampPalette(c("green", "red", "blue"))
-plot(dmap, col=cl)
+plot(beidens, col=cl)
 
 cl <- colorRampPalette(c("green", "red", "blue"))(100)
-plot(dmap, col=cl)
+#100 are the intermediate colors
+plot(beidens, col=cl)
 
 # R colors are here:
 # https://r-charts.com/colors/
 
 cln <- colorRampPalette(c("chartreuse1", "brown2", "cyan", "lightblue"))
-plot(dmap, col=cln)
+plot(beidens, col=cln)
 
 # plot the dmap with two different color ramps one on top of the other
 dev.off()
 
 par(mfrow=c(2,1)) 
-plot(dmap, col=cl)
-plot(dmap, col=cln)
+plot(beidens, col=cl)
+plot(beidens, col=cln)
