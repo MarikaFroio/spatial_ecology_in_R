@@ -1,0 +1,93 @@
+#code for estimating population density
+#package in R: spatstat, in CRAN
+#install.packages to install
+#vignettes
+#installing the package
+install.packages("spatstat")
+library(spatstat)
+#spatstat is a major package for analyzing geographic or spatial point pattern data. 
+#Common functions / capabilities:
+#-Create point pattern objects (ppp)
+#-Estimate intensity and density
+#-Compute summary statistics (K-function, pair correlation, etc.)
+#-Fit spatial point process models (Poisson, Gibbs, Cox)
+#-Simulate spatial point patterns
+#Handle windows (observation areas), marks, and multitype patterns
+
+bei
+#In spatstat, bei is the name of a built-in example dataset.
+#It is not a function—it is a spatial point pattern dataset included in spatstat.data.
+#bei is a dataset containing locations of tree seedlings in a tropical forest plot in Belize (“Bei”).
+#It is stored as a ppp object (a spatial point pattern).
+
+plot(bei, pch=15, col="magenta4")
+plot(bei, pch=15, cex=0.5)
+#related to 2 different maps: elevation and gradient
+bei.extra
+#In spatstat, bei.extra is an auxiliary dataset that provides environmental covariate rasters associated with the bei point pattern.
+#Typically it includes items such as:elev — elevation raster, grad — slope or gradient, covariate images used to model the point pattern intensity
+
+plot(bei.extra)
+#if I want to plot just 1 variable, symbol linking variable to extra $
+plot(bei.extra$elev)
+#I can also directly put the number of the variable like 1,2... for first, second
+#[[]] I subset the variable. because we are using raster data (raster comes from aratro, which creates lines?????). 
+plot(bei.extra[[1]])
+plot(bei.extra[[2]])
+
+#link a name to bei.extra with <-. I am creating a new object
+el<-bei.extra[[1]]
+plot(el)
+
+#producing a density map. passing from points (vectors) to  a map (raster): A raster is a type of spatial data that represents the world as a grid of cells (like pixels in an image),It is one of the two main ways to store geographic data (the other is vector data: points, lines, polygons). 
+beidens<-density(bei)
+plot(beidens)
+
+#plotting the elvation is the opposite of the density
+plot(el)
+#el<-elevation(bei)??
+points(bei)
+#In R, points(bei) (after plotting density or elevation map) is used to add the original point pattern on top of the density map.
+
+plot(beidens)
+points(bei)
+plot
+
+#to enter the function????
+#code: density?????
+
+# Plotting together the density map and the elevation
+el <- bei.extra[[1]]
+
+# one object is dmap and the other is el
+# how to plot the dmap beside el?
+par(mfrow=c(1,2)) # we will solve this anti-human stuff soon!
+plot(dmap)
+plot(el)
+
+# plot the dmap ontop of the el map
+par(mfrow=c(2,1)) 
+plot(dmap)
+plot(el)
+
+# if you want to close graphical devices this is your friend:
+dev.off()
+
+cl <- colorRampPalette(c("green", "red", "blue"))
+plot(dmap, col=cl)
+
+cl <- colorRampPalette(c("green", "red", "blue"))(100)
+plot(dmap, col=cl)
+
+# R colors are here:
+# https://r-charts.com/colors/
+
+cln <- colorRampPalette(c("chartreuse1", "brown2", "cyan", "lightblue"))
+plot(dmap, col=cln)
+
+# plot the dmap with two different color ramps one on top of the other
+dev.off()
+
+par(mfrow=c(2,1)) 
+plot(dmap, col=cl)
+plot(dmap, col=cln)
