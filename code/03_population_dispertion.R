@@ -127,6 +127,7 @@ points(pres)
 prec<-system.file("external/precipitation.asc", package="sdm")
 
 precmap<-rast(prec)
+plot(precmap)
 points(pres)
 
 
