@@ -1,21 +1,34 @@
 # install.packages("sdm")
 # install.packages("terra")
+# terra → used for spatial data (rasters, vectors, maps), sdm → a package for species distribution modeling
 
 library(terra)
 library(sdm)
 
 file <- system.file("external/species.shp", package="sdm")
+#This line: looks inside the sdm package folder, finds the example file "species.shp", returns its full path and saves it in the variable file.
+#species.shp is the name of a shapefile that contains species occurrence data. A shapefile is a common GIS file format for storing vector spatial data (points, lines, or polygons).
+It is used to store geographic features along with their attributes.
 
 rana <- vect(file)
-plot(rana)
+#vect() is a terra function. It reads the shapefile and converts it into a SpatVector object.
+#A SpatVector is a data object used in the terra package in R to store vector spatial data.
+#rana now contains the spatial points from the shapefile. The shapefile contains species occurrence points (locations where a species was observed). 
 
+plot(rana)
+#In short: You load spatial packages, You locate an example shapefile included with sdm, You read it as a vector object, You plot the species occurrence points
 
 # Assuming 'rana' is your SpatVector with points and attributes
 # Extract coordinates using the geom() function
 coordinates <- geom(rana)
+#In the context of terra (the package you are using), geom() is a function used with a SpatVector to extract its geometry.
+#For a SpatVector, geom() returns the coordinates of the geometry (points, lines, polygons), usually in a tabular form.
+#This will give you a data frame-like object containing: the x and y coordinates, geometry IDs, part IDs (for polygons or multi-part features)
+#Even though geom(rana) looks like a data frame when printed, it is actually a matrix or terra-specific object, not a genuine R data.frame.
 
 # Convert the coordinates to a data frame
 coordinates_df <- as.data.frame(coordinates)
+#to convert it into a real data frame, especially if you want to use functions that require a true data.frame
 
 # Extract the 'Occurrence' attribute from the SpatVector
 occurrence_df <- as.data.frame(rana$Occurrence)
@@ -46,6 +59,10 @@ rana$Occurrence
 plot(rana)
 
 pres <- rana[rana$Occurrence==1]
+#pres = presence-only data
+#the command is used to subset the dataset and keep only the points where the species is present.
+#1 = species present, (sometimes 0 = species absent, depending on dataset)
+#in short: This command filters the dataset, keeping only the spatial records where the species was observed (Occurrence = 1).
 
 # Exercise: plot in a multiframe the rana dataset beside the pres dataset
 par(mfrow=c(1,2))
@@ -67,7 +84,7 @@ plot(pres)
 plot(abse)
 
 # Excercise: plot the presences in blue together with absences in red
-dev.off()
+dev.off() #???
 plot(pres, col="blue", pch=19, cex=2)
 points(abse, col="red", pch=19, cex=2)
 
@@ -76,6 +93,10 @@ elev <- system.file("external/elevation.asc", package="sdm")
 # [1] "/usr/local/lib/R/site-library/sdm/external/elevation.asc"
 
 elevmap <- rast(elev)
+#In R, the function rast() from the terra package is used to read or create raster objects.
+#rast() reads the file and converts it into a SpatRaster object.
+#A SpatRaster is terra’s data structure for raster data.
+#Once it is a SpatRaster, you can: plot it, extract values, manipulate the raster, overlay points, compute statistics, etc.
 
 # Exercise: change the colors of the elevation map by the colorRampPalette function
 cl <- colorRampPalette(c("green","hotpink","mediumpurple"))(100)
