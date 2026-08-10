@@ -1,1 +1,8 @@
-
+setwd("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project")
+install.packages(c("tidyverse", "lubridate", "vegan"))
+library("tidyverse")
+library("lubridate")
+library("vegan")
+ fish <- read.csv2("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project/sao miguel fish species.csv", fileEncoding = "Windows-1252")
+glimpse(fish)
+head(fish)
