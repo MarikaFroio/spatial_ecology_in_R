@@ -1,1 +1,67 @@
+#to set directory
+setwd("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project")
+#upload file
+fish <- read.csv2("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project/sao miguel fish species.csv", fileEncoding = "Windows-1252")
+#install packages that I might need (check if I need them)
+install.packages(c("tidyverse", "lubridate", "vegan"))
+library("tidyverse")
+library("lubridate")
+library("vegan")
+#check data nature
+glimpse(fish)
+#count empty spaces as NA
+fish[fish == ""] <- NA
+fish<- fish|> fill(site, date, visibility.m, tide, water.T..C, wave.height.m, wave.period.s, wave.power.kW.m, wind.km.h, level, time)
+#transform data from chr
+fish$date<-dmy(fish$date)
+fish$abundances<-as.numeric(fish$abundances)
+fish$size.cm<-as.numeric(fish$size.cm)
+fish$visibility.m<-as.numeric(fish$visibility.m)
+fish$water.T..C<-as.numeric(fish$water.T..C)
+fish$wave.height.m<-as.numeric(fish$wave.height.m)
+fish$wave.height.m<-as.numeric(fish$wave.height.m)
+fish$wave.power.kW.m<-as.numeric(fish$wave.power.kW.m)
+fish$wave.period.s<-as.numeric(fish$wave.period.s)
+fish$wind.km.h<-as.numeric(fish$wind.km.h)
+fish$time <- hm(fish$time)
+#check
+glimpse(fish)
+#remove sea urchin, juveniles and count different kinds of axillary wrasse as same species
+fish <- fish |> mutate(species_clean = case_when(fish.species %in% c( 
+"axillary wrasse", 
+"axillary wrasse (blue)",
+"axillary wrasse (orange/brown)") ~ "axillary wrasse",          
+fish.species %in% c(
+ "juveniles",
+ "sea urchin") ~ NA_character_,        
+TRUE ~ fish.species))
+#OBJECTIVE: STUDY OF FISH COMMUNITY ACROSS THE SOUTHERN COAST OF SAO MIGUEL ISLAND
+#1 SPECIES RICHNESS: OVERALL SPECIES RICHNESS AND SITE SPECIFIC SPECIES RICHNESS
+#OVERALL SPECIES RICHNESS
+overall_richness <- fish |>summarise
+(species_richness = n_distinct(species_clean, na.rm = TRUE))
+> overall_richness
+#table with species names (overall)
+species_total <- fish |> filter(!is.na(species_clean)) |>
+distinct(species_clean) |>
+arrange(species_clean) |>
+mutate(species_number = row_number()) |>
+select(species_clean)
+species_total
+#SITE SPECIES RICHNESS
+site_richness <- fish |>filter(!is.na(species_clean)) |>
+group_by(site) |>
+summarise(
+species_richness = n_distinct(species_clean),
+.groups = "drop") 
+site_richness
+#table with names
+species_by_site <- fish |>
+filter(!is.na(species_clean)) |>
+group_by(site) |>
+summarise(
+species_richness = n_distinct(species_clean),
+species = paste(sort(unique(species_clean)), collapse = ", "),
+.groups = "drop")
+species_by_site
 
