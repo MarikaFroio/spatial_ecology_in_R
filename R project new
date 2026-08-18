@@ -27,20 +27,41 @@ fish$time <- hm(fish$time)
 #check
 glimpse(fish)
 #remove sea urchin, juveniles and count different kinds of axillary wrasse as same species
-fish <- fish |> mutate(species_clean = case_when(fish.species %in% c( 
-"axillary wrasse", 
-"axillary wrasse (blue)",
-"axillary wrasse (orange/brown)") ~ "axillary wrasse",          
-fish.species %in% c(
- "juveniles",
- "sea urchin") ~ NA_character_,        
-TRUE ~ fish.species))
+fish <- fish |>
+  mutate(
+    species_clean = case_when(
+      
+      # Unire le diverse categorie di axillary wrasse
+      fish.species %in% c(
+        "axillary wrasse",
+        "axillary wrasse (blue)",
+        "axillary wrasse (orange/brown)"
+      ) ~ "axillary wrasse",
+      
+      # Unire le diverse categorie di parrotfish
+      fish.species %in% c(
+        "parrotfish",
+        "parrotfish ",
+        "parrot fish"
+      ) ~ "parrotfish",
+      
+      # Escludere juveniles e sea urchin
+      fish.species %in% c(
+        "juveniles",
+        "sea urchin"
+      ) ~ NA_character_,
+      
+      # Mantenere tutte le altre specie
+      TRUE ~ fish.species
+    )
+  )
+
 #OBJECTIVE: STUDY OF FISH COMMUNITY ACROSS THE SOUTHERN COAST OF SAO MIGUEL ISLAND
 #1 SPECIES RICHNESS: OVERALL SPECIES RICHNESS AND SITE SPECIFIC SPECIES RICHNESS
 #OVERALL SPECIES RICHNESS
 overall_richness <- fish |>summarise
 (species_richness = n_distinct(species_clean, na.rm = TRUE))
-> overall_richness
+overall_richness
 #table with species names (overall)
 species_total <- fish |> filter(!is.na(species_clean)) |>
 distinct(species_clean) |>
@@ -64,4 +85,101 @@ species_richness = n_distinct(species_clean),
 species = paste(sort(unique(species_clean)), collapse = ", "),
 .groups = "drop")
 species_by_site
+#OVERALL FREQUENCY
+#to identify all the transects (sampling occasions)
+sampling_occasions <- fish |>
+distinct(site, date) 
+total_occasions <- nrow(sampling_occasions)
+total_occasions
+#to calculate overall species frequency
+species_frequency_overall <- fish |>
+filter(!is.na(species_clean)) |>
+distinct(site, date, species_clean) |>
+count(species_clean, name = "occurrences") |>
+mutate(total_sampling_occasions = total_occasions,
+frequency_percent = occurrences / total_occasions * 100) |> arrange(desc(frequency_percent))
+species_frequency_overall
+#to make the table
+frequency_table_overall <- species_frequency_overall |>
+select(species = species_clean, frequency_percent)
+frequency_table_overall
+#SITE FREQUENCY
+#to identify the 5 transect per each site
+site_sampling_occasions <- fish |>
+  distinct(site, date) |>
+  count(site, name = "total_sampling_dates")
+site_sampling_occasions
+#to calculate species fequency for each site
+species_frequency_site <- fish |>
+  filter(!is.na(species_clean)) |>
+  distinct(site, date, species_clean) |>
+  count(site, species_clean, name = "occurrences") |>
+  left_join(
+    site_sampling_occasions,
+    by = "site"
+  ) |>
+  mutate(
+    frequency_percent = occurrences / total_sampling_dates * 100
+  ) |>
+  arrange(site, desc(frequency_percent))
+#to make the matrix table
+frequency_matrix <- species_frequency_site |>
+  select(site, species_clean, frequency_percent) |>
+  pivot_wider(
+    names_from = site,
+    values_from = frequency_percent,
+    values_fill = 0
+  )
+
+frequency_matrix
+#SITE MEAN ABUNDANCE
+#to select the abundances and count 0 when species are not registered
+species_sampling <- fish |> filter(!is.na(species_clean)) |> group_by(site, date, species_clean) |> summarise(
+abundance = sum(abundances, na.rm = TRUE),
+.groups = "drop")
+
+all_species <- fish |> filter(!is.na(species_clean)) |>
+distinct(species_clean)
+species_sampling_complete <- merge(
+sampling_occasions,
+all_species,
+by = NULL)
+
+#to check the total samplings
+nrow(species_sampling_complete)
+#to calculate the mean abundance per site
+species_sampling_complete <- species_sampling_complete |>
+left_join(species_sampling,
+by = c("site", "date", "species_clean")) |>
+mutate(abundance = replace_na(abundance, 0))
+mean_abundance_site
+#abbondanza media totale
+mean_abundance_overall <- species_sampling_complete |>
+  group_by(species_clean) |>
+  summarise(
+    mean_abundance = mean(abundance),
+    .groups = "drop"
+  ) |>
+  arrange(desc(mean_abundance))
+mean_abundance_overall
+#tabella totale
+abundance_table_overall <- mean_abundance_overall |>
+  select(
+    species = species_clean,
+    mean_abundance
+  )
+
+abundance_table_overall
+#tabella matrice sito x abbondanza
+abundance_matrix <- mean_abundance_site |>
+  select(site, species_clean, mean_abundance) |>
+  pivot_wider(
+    names_from = site,
+    values_from = mean_abundance,
+    values_fill = 0
+  )
+
+abundance_matrix
+
+
 
