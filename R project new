@@ -396,5 +396,118 @@ ggplot(
       face = "bold"
     )
   )
+#BRAY CURTIS-CLUSTERING for species >20%
+#selection of common species
+common_species <- species_frequency_overall |>
+  filter(frequency_percent >= 20) |>
+  pull(species_clean)
+
+common_species
+#matrix
+species_matrix_common <- species_sampling_complete |>
+  filter(species_clean %in% common_species) |>
+  mutate(
+    sampling = paste(site, date, sep = "_")
+  ) |>
+  select(sampling, species_clean, abundance) |>
+  pivot_wider(
+    names_from = species_clean,
+    values_from = abundance,
+    values_fill = 0
+  )
+species_matrix_common_t <- species_matrix_common |>
+  column_to_rownames("sampling") |>
+  t()
+#bray-curtis
+bray_species_common <- vegdist(
+  species_matrix_common_t,
+  method = "bray"
+)
+
+bray_species_common
+#clustering
+cluster_species_common <- hclust(
+  bray_species_common,
+  method = "average"
+)
+
+plot(
+  cluster_species_common,
+  main = "Clustering of fish species based on Bray-Curtis dissimilarity",
+  xlab = "Species",
+  ylab = "Bray-Curtis dissimilarity",
+  sub = "",
+  cex = 0.9
+)
+#NMDS
+# NMDS - COMMUNITY COMPOSITION
+
+community_matrix <- species_sampling_complete |>
+  mutate(
+    sampling = paste(site, date, sep = "_")
+  ) |>
+  select(sampling, species_clean, abundance) |>
+  pivot_wider(
+    names_from = species_clean,
+    values_from = abundance,
+    values_fill = 0
+  )
+#matrix for vegan
+community_matrix
+community_matrix_nmds <- community_matrix |>
+  column_to_rownames("sampling")
+#NMDS
+set.seed(123)
+
+nmds <- metaMDS(
+  community_matrix_nmds,
+  distance = "bray",
+  k = 2,
+  trymax = 100,
+  autotransform = FALSE
+)
+
+nmds
+#check stress
+nmds$stress
+#(accettabile)
+#dataset for plot
+nmds_points <- as.data.frame(scores(nmds, display = "sites"))
+
+nmds_points$sampling <- rownames(nmds_points)
+
+nmds_points <- nmds_points |>
+  mutate(
+    site = sub("_.*", "", sampling),
+    date = sub("^[^_]*_", "", sampling)
+  )
+
+nmds_points
+#plot
+ggplot(
+  nmds_points,
+  aes(
+    x = NMDS1,
+    y = NMDS2,
+    color = site
+  )
+) +
+  geom_point(
+    size = 4,
+    alpha = 0.8
+  ) +
+  labs(
+    x = "NMDS1",
+    y = "NMDS2",
+    color = "Site",
+    title = "NMDS of fish community composition",
+    subtitle = paste("Bray-Curtis dissimilarity | Stress =", round(nmds$stress, 3))
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.title = element_text(face = "bold")
+  )
+
 
 
