@@ -153,7 +153,17 @@ left_join(species_sampling,
 by = c("site", "date", "species_clean")) |>
 mutate(abundance = replace_na(abundance, 0))
 mean_abundance_site
-#abbondanza media totale
+
+#NUOVO CODICE MEAN ABUNDANCE PER SITE CHE MANCAVA
+mean_abundance_site <- species_sampling_complete |>
+  group_by(site, species_clean) |>
+  summarise(
+    mean_abundance = mean(abundance, na.rm = TRUE),
+    .groups = "drop"
+  )
+mean_abundance_site
+
+#MEAN OVERALL ABUNDANCE
 mean_abundance_overall <- species_sampling_complete |>
   group_by(species_clean) |>
   summarise(
@@ -170,7 +180,7 @@ abundance_table_overall <- mean_abundance_overall |>
   )
 
 abundance_table_overall
-#tabella matrice sito x abbondanza
+#abundance matrix table
 abundance_matrix <- mean_abundance_site |>
   select(site, species_clean, mean_abundance) |>
   pivot_wider(
@@ -180,6 +190,211 @@ abundance_matrix <- mean_abundance_site |>
   )
 
 abundance_matrix
+#heatmap overall abundance
+ggplot(
+  mean_abundance_overall,
+  aes(
+    x = "Southern coast",
+    y = reorder(species_clean, mean_abundance),
+    fill = mean_abundance
+  )
+) +
+  geom_tile(color = "white") +
+  geom_text(
+    aes(label = round(mean_abundance, 2)),
+    color = "black",
+    size = 3.5
+  ) +
+  scale_fill_gradient(
+    low = "yellow",
+    high = "orange"
+  ) +
+  labs(
+    x = NULL,
+    y = "Species",
+    fill = "Mean abundance",
+    title = "Mean abundance of fish species along the southern coast"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(face = "bold"),
+    axis.text.y = element_text(size = 9),
+    plot.title = element_text(face = "bold")
+  )
+#heatmap site abundance
+ggplot(
+  abundance_matrix |>
+    tidyr::pivot_longer(
+      cols = -species_clean,
+      names_to = "site",
+      values_to = "mean_abundance"
+    ),
+  aes(
+    x = site,
+    y = reorder(species_clean, mean_abundance),
+    fill = mean_abundance
+  )
+) +
+  geom_tile(color = "white") +
+  geom_text(
+    aes(label = round(mean_abundance, 2)),
+    size = 3
+  ) +
+  scale_fill_gradient(
+    low = "yellow",
+    high = "orange"
+  ) +
+  labs(
+    x = "Site",
+    y = "Species",
+    fill = "Mean abundance",
+    title = "Mean abundance of fish species across sites"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+      face = "bold"
+    ),
+    axis.text.y = element_text(size = 8),
+    plot.title = element_text(face = "bold")
+  )
+#SHANNON DIVERSITY OVERALL
+# sommare l'abbondanza di ogni specie su tutta la costa
+abundance_overall <- species_sampling_complete |>
+  group_by(species_clean) |>
+  summarise(
+    total_abundance = sum(abundance, na.rm = TRUE),
+    .groups = "drop"
+  )
 
+# calcolare indice di Shannon
+shannon_overall <- diversity(
+  abundance_overall$total_abundance,
+  index = "shannon"
+)
+
+shannon_overall
+#SHANNON DIVERSITY PER SITE
+abundance_site <- species_sampling_complete |>
+  group_by(site, species_clean) |>
+  summarise(
+    total_abundance = sum(abundance, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# calcolare Shannon per ogni sito
+shannon_site <- abundance_site |>
+  group_by(site) |>
+  summarise(
+    shannon = diversity(
+      total_abundance,
+      index = "shannon"
+    ),
+    .groups = "drop"
+  ) |>
+  arrange(desc(shannon))
+
+shannon_site
+#plot shannon per site
+ggplot(
+  shannon_site,
+  aes(
+    x = reorder(site, shannon),
+    y = shannon
+  )
+) +
+  geom_col(
+    fill = "steelblue"
+  ) +
+  geom_text(
+    aes(label = round(shannon, 2)),
+    vjust = -0.3,
+    size = 4
+  ) +
+  labs(
+    x = "Site",
+    y = "Shannon diversity index (H')",
+    title = "Fish diversity across sites"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+      face = "bold"
+    ),
+    plot.title = element_text(face = "bold")
+  )
+#SPECIES ABUNDANCE SIMILARITY 
+#matrix species x site
+
+abundance_species_site <- mean_abundance_site |>
+  select(species_clean, site, mean_abundance) |>
+  pivot_wider(
+    names_from = site,
+    values_from = mean_abundance,
+    values_fill = 0
+  )
+
+abundance_species_site
+#species correlation matrix
+species_correlation <- abundance_species_site |>
+  column_to_rownames("species_clean") |>
+  t() |>
+  cor(
+    method = "spearman"
+  )
+
+species_correlation
+#heatmap
+correlation_long <- species_correlation |>
+  as.data.frame() |>
+  rownames_to_column("species_1") |>
+  pivot_longer(
+    cols = -species_1,
+    names_to = "species_2",
+    values_to = "correlation"
+  )
+
+ggplot(
+  correlation_long,
+  aes(
+    x = species_1,
+    y = species_2,
+    fill = correlation
+  )
+) +
+  geom_tile(
+    color = "white"
+  ) +
+  scale_fill_gradient2(
+    low = "blue",
+    mid = "white",
+    high = "red",
+    midpoint = 0,
+    limits = c(-1, 1)
+  ) +
+  labs(
+    x = NULL,
+    y = NULL,
+    fill = "Spearman\ncorrelation",
+    title = "Similarity in species abundance patterns across sites"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+      size = 8
+    ),
+    axis.text.y = element_text(
+      size = 8
+    ),
+    plot.title = element_text(
+      face = "bold"
+    )
+  )
 
 
