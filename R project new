@@ -89,9 +89,11 @@ names_sc_richnes
 #SITE SPECIES RICHNESS (number)
 site_richness <- fish |>filter(!is.na(species_official)) |>
 group_by(site) |>
+#dplyr function that groups data based on column site
 summarise(
 species_richness = n_distinct(species_official),
-.groups = "drop") 
+.groups = "drop")
+#function that gives the result in the original form
 site_richness
 #SITE SPECIES RICHNESS (names)
 species_by_site <- fish |>
@@ -100,6 +102,9 @@ group_by(site) |>
 summarise(
 species_richness = n_distinct(species_official),
 species = paste(sort(unique(species_official)), collapse = ", "),
+#paste puts data in the same string
+#sort orders data, usually in alphabetical order
+#unique removes duplicates
 .groups = "drop")
 species_by_site
 #OVERALL FREQUENCY
