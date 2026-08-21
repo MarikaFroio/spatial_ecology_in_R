@@ -65,10 +65,19 @@ fish <- fish |>
       TRUE ~ fish.species
     )
   )
+#coordinates
+library(terra)
+library(sdm)
+library(viridis)
+#adding coordinates to dataset
+coordinates<-data.frame(site=c("Praia da Pedreira", "Praia Ribeira das Tainhas", "Praia Baixa D'Areia", "Praia do Populo"), latitude= c(37,7154764, 37,7159691, 37,7165400, 37,7484241), longitude=c(-25,4627892, -25,4096397, -25,5179964, -25,6157604))
+fish<-merge(fish, coordinates, by = "site")
 
 #OBJECTIVE: STUDY OF FISH COMMUNITY ACROSS THE SOUTHERN COAST OF SAO MIGUEL ISLAND
+
 #1 SPECIES RICHNESS: OVERALL SPECIES RICHNESS AND SITE SPECIFIC SPECIES RICHNESS
 #OVERALL SPECIES RICHNESS
+
 sc_richness <- fish |>summarise
 #summarise gives the result as a table
 (species_richness = n_distinct(species_official, na.rm = TRUE))
@@ -83,10 +92,10 @@ distinct(species_official) |>
 #distinct removes duplicates. it gives 1 or more NAMES
 arrange(species_official) |>
 #arrange orders species, usually in alphabetic order
-
 names_sc_richnes
 
 #SITE SPECIES RICHNESS (number)
+
 site_richness <- fish |>filter(!is.na(species_official)) |>
 group_by(site) |>
 #dplyr function that groups data based on column site
@@ -107,6 +116,9 @@ species = paste(sort(unique(species_official)), collapse = ", "),
 #unique removes duplicates
 .groups = "drop")
 species_by_site
+
+#2 FREQUENCY
+
 #OVERALL FREQUENCY
 #to identify all the transects (sampling occasions)
 sampling_occasions <- fish |>
@@ -125,6 +137,7 @@ species_frequency_overall
 frequency_table_overall <- species_frequency_overall |>
 select(species = species_clean, frequency_percent)
 frequency_table_overall
+
 #SITE FREQUENCY
 #to identify the 5 transect per each site
 site_sampling_occasions <- fish |>
@@ -154,6 +167,9 @@ frequency_matrix <- species_frequency_site |>
   )
 
 frequency_matrix
+
+#3 MEAN ABUNDANCE
+
 #SITE MEAN ABUNDANCE
 #to select the abundances and count 0 when species are not registered
 species_sampling <- fish |> filter(!is.na(species_clean)) |> group_by(site, date, species_clean) |> summarise(
@@ -282,6 +298,9 @@ ggplot(
     axis.text.y = element_text(size = 8),
     plot.title = element_text(face = "bold")
   )
+
+#4 SHANNON DIVERSITY
+
 #SHANNON DIVERSITY OVERALL
 # sommare l'abbondanza di ogni specie su tutta la costa
 abundance_overall <- species_sampling_complete |>
@@ -296,8 +315,8 @@ shannon_overall <- diversity(
   abundance_overall$total_abundance,
   index = "shannon"
 )
-
 shannon_overall
+
 #SHANNON DIVERSITY PER SITE
 abundance_site <- species_sampling_complete |>
   group_by(site, species_clean) |>
@@ -349,7 +368,9 @@ ggplot(
     ),
     plot.title = element_text(face = "bold")
   )
-#SPECIES ABUNDANCE SIMILARITY 
+
+
+#5 SPECIES ABUNDANCE SIMILARITY 
 #matrix species x site
 
 abundance_species_site <- mean_abundance_site |>
@@ -368,8 +389,8 @@ species_correlation <- abundance_species_site |>
   cor(
     method = "spearman"
   )
-
 species_correlation
+
 #heatmap
 correlation_long <- species_correlation |>
   as.data.frame() |>
@@ -418,6 +439,9 @@ ggplot(
       face = "bold"
     )
   )
+
+#5 BRAY CURTIS-CLUSTERING
+
 #BRAY CURTIS-CLUSTERING for species >20%
 #selection of common species
 common_species <- species_frequency_overall |>
@@ -461,7 +485,9 @@ plot(
   sub = "",
   cex = 0.9
 )
-#NMDS
+
+#6NMDS
+
 # NMDS - COMMUNITY COMPOSITION
 
 community_matrix <- species_sampling_complete |>
