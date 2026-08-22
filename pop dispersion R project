@@ -58,3 +58,45 @@ abse <- flounder_presence[
   flounder_presence$Occurrence == 0
 ]
 
+#normal plot
+plot(pres, 
+     col = "chartreuse1",
+     pch = 19,
+     main = "Flounder presence and absence")
+
+points(abse, 
+       col = "#FF1493",
+       pch = 19)
+
+text(pres, 
+     labels = pres$site,
+     pos = 3,
+     cex = 0.7)
+
+text(abse, 
+     labels = abse$site,
+     pos = 3,
+     cex = 0.7)
+
+legend("bottomright",
+       legend = c("Presence", "Absence"),
+       col = c("chartreuse1", "#FF1493"),
+       pch = 19)
+#map
+install.packages("mapview")
+library(mapview)
+
+map <- mapview(
+  pres,
+  col.regions = "chartreuse1",
+  cex = 8,
+  layer.name = "Presence"
+)
+
+m + mapview(
+  abse,
+  col.regions = "#FF1493",
+  cex = 8,
+  layer.name = "Absence"
+)
+
