@@ -1,0 +1,60 @@
+#adding sites coordinates
+coordinates <- data.frame(
+  site = c(
+    "Praia da Pedreira",
+    "Praia Ribeira das Tainhas",
+    "Praia Baixa D'Areia",
+    "Praia do Populo"
+  ),
+  latitude = c(
+    37.7154764,
+    37.7159691,
+    37.7165400,
+    37.7484241
+  ),
+  longitude = c(
+    -25.4627892,
+    -25.4096397,
+    -25.5179964,
+    -25.6157604
+  )
+)
+#combining dataset and coordinates
+fish <- merge(fish, coordinates, by = "site")
+#transforming fish into a spatvector
+library(terra)
+
+fish_vect <- vect(
+  fish,
+  geom = c("longitude", "latitude"),
+  crs = "EPSG:4326"
+)
+#extracting the 4 sites
+sites <- fish_vect[!duplicated(fish_vect$site), ]
+#choosing 1 species
+flounder_sites <- unique(
+  fish_vect$site[fish_vect$fish.species == "flounder"]
+)
+#creating the occurrence
+sites$Occurrence <- 0
+sites$Occurrence[
+  sites$site %in% flounder_sites
+] <- 1
+#check
+sites$Occurrence
+#renaming sites into presence
+flounder_presence <- sites
+#check
+flounder_presence
+#data frame flounder occurrence
+occurrence_df <- as.data.frame(
+  flounder_presence$Occurrence
+)
+#presence and absence
+pres <- flounder_presence[
+  flounder_presence$Occurrence == 1
+]
+abse <- flounder_presence[
+  flounder_presence$Occurrence == 0
+]
+
