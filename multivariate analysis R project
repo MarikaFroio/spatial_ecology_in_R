@@ -1,0 +1,61 @@
+# 1. exctract values from spatvector
+fish_df <- values(fish_vect)
+
+
+# 2. Creare un identificativo per ogni transect
+# Ogni combinazione site + date = un transect
+fish_df$transect <- paste(
+  fish_df$site,
+  fish_df$date,
+  sep = "_"
+)
+
+
+# 3. Creare la matrice 2D
+# Righe = transect
+# Colonne = specie
+# Valori = abbondanze
+dca_matrix <- xtabs(
+  abundances ~ transect + fish.species,
+  data = fish_df
+)
+
+
+# 4. Sostituire eventuali NA con 0
+dca_matrix[is.na(dca_matrix)] <- 0
+
+
+# 5. Controllare la dimensione della matrice
+dim(dca_matrix)
+
+
+# 6. Fare la DCA
+dca <- decorana(dca_matrix)
+
+
+# 7. Prendere gli eigenvalues dei 4 assi
+dcal1 <- dca$evals[1]
+dcal2 <- dca$evals[2]
+dcal3 <- dca$evals[3]
+dcal4 <- dca$evals[4]
+
+
+# 8. Calcolare l'inertia totale
+total <- sum(c(dcal1, dcal2, dcal3, dcal4))
+
+
+# 9. Calcolare la percentuale spiegata da DCA1 e DCA2
+percdca1 <- dcal1 * 100 / total
+percdca2 <- dcal2 * 100 / total
+
+
+# 10. Controllare le percentuali
+percdca1
+percdca2
+
+# Percentuale complessiva spiegata da DCA1 + DCA2
+percdca1 + percdca2
+
+
+# 11. Grafico della DCA
+plot(dca)
