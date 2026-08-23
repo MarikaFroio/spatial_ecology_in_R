@@ -58,3 +58,8 @@ percdca1 + percdca2
 
 # plot. non va bene bisogna cambiarlo
 plot(dca)
+
+#PCA
+pca<-pca(dca_matrix)
+pca
+plot(pca)
