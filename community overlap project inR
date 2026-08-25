@@ -1,3 +1,9 @@
+#to set in english
+Sys.setlocale("LC_TIME", "C")
+
+install.packages("overlap")
+library(overlap)
+
 #ABUNDANCE CHANGE WITH TIME
 #To change time into decimal hours
 fish$time_dh<-hour(fish$time)+(minute(fish$time)/60)
@@ -10,15 +16,19 @@ white_seabream_time<-white_seabream$time_dh_circ
 #to select the abundances of white seabream
 white_seabream_abundance<-white_seabream$abundances
 #density plot does not work because it would tell me only at what time I did the survey, so I will compare abundances and time in a graph
-plot(white_seabream_time, white_seabream_abundance, xlab="time of day", ylab="abundance", main="white seabream - abundance change with time")
-#CIRCULAR KERNEL DENSITY WHITE SEABREAM
-densityPlot(white_seabream_time)
+plot(white_seabream$time_dh, white_seabream_abundance, xlab="time of day", ylab="abundance", main="white seabream - abundance change with time")
+
 #with date
 white_seabream_date<-white_seabream$date
 plot(white_seabream_date, white_seabream_abundance, xlab="date", ylab="abundance", main="white seabream - abundance change with date")
-#LINEAR KERNEL DENSITY WHITE SEABREAM
-linear_kd<-density(white_seabream_date_numeric)
-plot(linear_kd,
+
+#CIRCULAR KERNEL DENSITY WHITE SEABREAM - TIME
+densityPlot(white_seabream_time)
+
+#LINEAR KERNEL DENSITY WHITE SEABREAM - DATE
+white_seabream_date_numeric<-as.numeric(white_seabream$date)
+wsb_linear_kd<-density(white_seabream_date_numeric)
+plot(wsb_linear_kd,
      xlab = "date",
      ylab = "density",
      main = "white seabream - kernel density over time",
@@ -29,7 +39,120 @@ axis(1,
      labels = as.Date(pretty(white_seabream_date_numeric),
                       origin = "1970-01-01"))
 
+#COMPARISON WITH SALEMA
+#salema data
+salema<-fish[fish$fish.species=="salema",]
 
+#time
+salema_time<-salema$time_dh_circ
+salema_abundance<-salema$abundances
+plot(salema$time_dh, salema_abundance, xlab="time", ylab="abundance", main="salema - abundance change with time")
+#circular kernel density
+densityPlot(salema_time)
 
+#date
+salema_date<-salema$date
+plot(salema_date, salema_abundance, xlab = "date", ylab="abundance", main="salema - abundance change with date")
+#linear kernel density
+s_linear_kd<-density(salema_date_numeric)
+plot(s_linear_kd,
+      xlab = "date",
+      ylab = "density",
+      main = "salema - kernel density over time",
+      xaxt = "n")
 
+axis(1,
+      at = pretty(salema_date_numeric),
+      labels = as.Date(pretty(salema_date_numeric),
+                       origin = "1970-01-01"))
+#COMPARISON CIRCULAR TIME WHITE SEABREAM-SALEMA
+overlapPlot(white_seabream_time, salema_time)
+
+#COMPARISON LINEAR DATE WHITE SEABREAM-SALEMA
+plot(wsb_linear_kd,
+      col = "blue",
+      xaxt = "n",
+      xlab = "date",
+      ylab = "density",
+      main = "white seabream- salema kernel density overlap")
+ 
+lines(s_linear_kd, col = "red")
+ 
+axis(1,
+      at = pretty(c(wsb_linear_kd$x, s_linear_kd$x)),
+      labels = as.Date(pretty(c(wsb_linear_kd$x, s_linear_kd$x)),
+                       origin = "1970-01-01")) 
+
+#LOOP TIME DENSITY PLOT ALL SPECIES
+par(mfrow = c(3, 3))
+
+for (species in species_list) {
+  
+  species_data <- fish[fish$fish.species == species, ]
+  
+  if (nrow(species_data) >= 2) {
+    
+    plot(density(species_data$time_dh_circ),
+         main = paste("Density Plot of Time for", species),
+         xlab = "Time of day",
+         xaxt = "n",
+         cex.main = 0.8)
+    
+    axis(1,
+         at = seq(0, 2*pi, by = pi/6),
+         labels = seq(0, 24, by = 2))
+  }
+}
+
+#LOOP DATE-ABUNDANCE ALL SPECIES
+species_list <- unique(fish$fish.species)
+
+par(mfrow = c(3, 3))
+
+for (species in species_list) {
+  
+  species_data <- fish[fish$fish.species == species, ]
+  
+  if (nrow(species_data) >= 2) {
+    
+    plot(species_data$date,
+         species_data$abundances,
+         xlab = "Date",
+         ylab = "Abundance",
+         main = paste(species, "- abundance change with date"),
+         xaxt = "n",
+         cex.main = 0.8)
+    
+    axis(1,
+         at = pretty(species_data$date),
+         labels = as.Date(pretty(species_data$date),
+                          origin = "1970-01-01"))
+  }
+}
+#LOOP LINEAR KERNEL DENSITY DATE
+fish$date_numeric <- as.numeric(fish$date)
+species_list <- unique(fish$fish.species)
+
+par(mfrow = c(3, 3))
+
+for (species in species_list) {
+  
+  species_data <- fish[fish$fish.species == species, ]
+  
+  if (nrow(species_data) >= 2) {
+    
+    linear_kd <- density(species_data$date_numeric)
+    
+    plot(linear_kd,
+         main = paste("Kernel density of date for", species),
+         xlab = "Date",
+         xaxt = "n",
+         cex.main = 0.8)
+    
+    axis(1,
+         at = pretty(species_data$date_numeric),
+         labels = as.Date(pretty(species_data$date_numeric),
+                          origin = "1970-01-01"))
+  }
+}
 
