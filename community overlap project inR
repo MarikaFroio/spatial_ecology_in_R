@@ -1,1 +1,35 @@
+#ABUNDANCE CHANGE WITH TIME
+#To change time into decimal hours
+fish$time_dh<-hour(fish$time)+(minute(fish$time)/60)
+#to create circular time
+fish$time_dh_circ<-fish$time_dh*2*pi/24
+#to select the species
+white_seabream<-fish[fish$fish.species=="white seabream",]
+#to select the time during which white seabream was observed
+white_seabream_time<-white_seabream$time_dh_circ
+#to select the abundances of white seabream
+white_seabream_abundance<-white_seabream$abundances
+#density plot does not work because it would tell me only at what time I did the survey, so I will compare abundances and time in a graph
+plot(white_seabream_time, white_seabream_abundance, xlab="time of day", ylab="abundance", main="white seabream - abundance change with time")
+#CIRCULAR KERNEL DENSITY WHITE SEABREAM
+densityPlot(white_seabream_time)
+#with date
+white_seabream_date<-white_seabream$date
+plot(white_seabream_date, white_seabream_abundance, xlab="date", ylab="abundance", main="white seabream - abundance change with date")
+#LINEAR KERNEL DENSITY WHITE SEABREAM
+linear_kd<-density(white_seabream_date_numeric)
+plot(linear_kd,
+     xlab = "date",
+     ylab = "density",
+     main = "white seabream - kernel density over time",
+     xaxt = "n")
+
+axis(1,
+     at = pretty(white_seabream_date_numeric),
+     labels = as.Date(pretty(white_seabream_date_numeric),
+                      origin = "1970-01-01"))
+
+
+
+
 
