@@ -1,1 +1,52 @@
+#to set directory
+setwd("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project")
+#upload file
+fish <- read.csv2("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project/sao miguel fish species.csv", fileEncoding = "Windows-1252")
+install.packages(c("tidyverse", "lubridate", "vegan"))
+#tidyverse: to visualize, clean and change data
+#lubridate: to work with date and time
+#vegan: to make ecological analyses 
+library("tidyverse")
+library("lubridate")
+library("vegan")
+#check data nature
+glimpse(fish)
 
+#FIX DATASET
+#count empty spaces as NA
+fish[fish == ""] <- NA
+# [] selects a part of the file. i want to change empty strings into null data
+fish<- fish|> fill(site, date, visibility.m, tide, water.T..C, wave.height.m, wave.period.s, wave.power.kW.m, wind.km.h, level, time)
+#to apply the function to the following elements
+#transform data from chr
+fish$date<-dmy(fish$date)
+#dmy transforms a character date into a date recognized by R
+fish$abundances<-as.numeric(fish$abundances)
+#as.numeric transforms a character into a number
+fish$size.cm<-as.numeric(fish$size.cm)
+fish$visibility.m<-as.numeric(fish$visibility.m)
+fish$water.T..C<-as.numeric(fish$water.T..C)
+fish$wave.height.m<-as.numeric(fish$wave.height.m)
+fish$wave.height.m<-as.numeric(fish$wave.height.m)
+fish$wave.power.kW.m<-as.numeric(fish$wave.power.kW.m)
+fish$wave.period.s<-as.numeric(fish$wave.period.s)
+fish$wind.km.h<-as.numeric(fish$wind.km.h)
+fish$time <- hm(fish$time)
+#hm transforms time into time recognized by R
+
+# OVERALL SPECIES RICHNESS
+sc_richness <- fish |>
+  summarise(species_richness = n_distinct(species_official))
+#n_distinct counts unique/different values, so how many different species we have. it gives a NUMBER
+sc_richness
+
+# table with species names (overall)
+names_sc_richness <- fish |>
+  distinct(species_official) |>
+  arrange(species_official)
+#distinct removes duplicates
+#arrange orders species, usually in alphabetic order
+names_sc_richness
+
+#check
+glimpse(fish)
