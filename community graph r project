@@ -1,0 +1,28 @@
+# Calculating mean size for each species
+species_size <- fish %>%
+  group_by(fish.species) %>%
+  summarise(mean_size = mean(size.cm, na.rm = TRUE))
+
+# Creatting big and small species categories based on mean size
+big_species <- species_size %>%
+  filter(mean_size > 15) %>%
+  pull(fish.species)
+
+small_species <- species_size %>%
+  filter(mean_size <= 15) %>%
+  pull(fish.species)
+
+# Creating interactions between big and small species
+interactions <- expand.grid(
+  big_species = big_species,
+  small_species = small_species
+)
+
+#directed graph
+interactions_graph <- graph_from_data_frame(
+  interactions,
+  vertices = species_size$fish.species,
+  directed = F
+)
+
+plot(interactions_graph)
