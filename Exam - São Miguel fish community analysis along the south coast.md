@@ -241,7 +241,9 @@ map_EN <- mapview(
 
 map_EN
 ```
+
 ![](duskygrouperRplot.png)
+
 
 ### Thicklip Grey Mullet (NT) presence-absence map
 ```md
