@@ -156,4 +156,110 @@ theme(
 ```
 ![](mean%20abundance%20Rplot.png)
 
+## 3. STUDY OF ENDANGERED (Dusky Grouper) AND NEAR THREATENED (Thicklip Grey Mullet) SPECIES DISTRIBUTION
+```md
+#adding sites coordinates
+coordinates <- data.frame(
+  site = c(
+    "Praia da Pedreira",
+    "Praia Ribeira das Tainhas",
+    "Praia Baixa D'Areia",
+    "Praia do Populo"),
+  latitude = c(
+    37.7154764,
+    37.7159691,
+    37.7165400,
+    37.7484241),
+  longitude = c(
+    -25.4627892,
+    -25.4096397,
+    -25.5179964,
+    -25.6157604))
+
+#combining dataset and coordinates
+fish <- merge(fish, coordinates, by = "site")
+#check names
+names(fish)
+#transforming the dataset into a Spatvector
+fish_vect <- vect(
+  fish,
+  geom = c("longitude.y", "latitude.x"),
+  crs = "EPSG:4326")
+
+#extracting the 4 sites
+sites <- fish_vect[!duplicated(fish_vect$site), ]
+#choosing 1st species
+EN_sites <- unique(
+  fish_vect$site[fish_vect$fish.species == "dusky grouper juvenile "])
+#choosing 2nd species
+NT_sites <- unique(
+  fish_vect$site[fish_vect$fish.species == "thicklip grey mullet"])
+
+#creating the occurrence 1st species
+sites$Occurrence_EN <- 0
+sites$Occurrence_EN[
+  sites$site %in% EN_sites
+] <- 1
+#check
+sites$Occurrence_EN
+
+#creating the occurrence 2nd species
+sites$Occurrence_NT <- 0
+sites$Occurrence_NT[
+  sites$site %in% NT_sites
+] <- 1
+#check
+sites$Occurrence_NT
+
+#data frame dusky grouper/thicklip grey mullet occurrence
+EN_occurrence_df <- as.data.frame(sites$Occurrence_EN)
+NT_occurrence_df <- as.data.frame(sites$Occurrence_NT)
+
+#presence and absence duskygrouper
+pres_EN <- sites[sites$Occurrence_EN == 1,]
+abse_EN <- sites[sites$Occurrence_EN == 0,]
+
+#presence and absence thicklip grey mullet
+pres_NT <- sites[sites$Occurrence_NT == 1,]
+abse_NT <- sites[sites$Occurrence_NT == 0,]
+```
+
+### Dusky Grouper (EN) presence-absence map
+```md
+map_EN <- mapview(
+  sites[sites$Occurrence_EN == 1, c("site", "Occurrence_EN")],
+  col.regions = "blue",
+  cex = 8,
+  layer.name = "Dusky grouper juvenile - Presence"
+) +
+  mapview(
+    sites[sites$Occurrence_EN == 0, c("site", "Occurrence_EN") ],
+    col.regions = "red",
+    cex = 8,
+    layer.name = "Dusky grouper juvenile - Absence"
+)
+
+map_EN
+```
+![](duskygrouperRplot.png)
+
+### Thicklip Grey Mullet (NT) presence-absence map
+```md
+map_NT <- mapview(
+  sites[sites$Occurrence_NT == 1, c("site", "Occurrence_NT")],
+  col.regions = "green",
+  cex = 8,
+  layer.name = "Thicklip grey mullet - Presence"
+) +
+  mapview(
+    sites[sites$Occurrence_NT == 0, "Occurrence_NT" ],
+    col.regions = "orange",
+    cex = 8,
+    layer.name = "Thicklip grey mullet - Absence"
+)
+
+map_NT
+```
+![](thicklipgreymulletRplot.png)
+
 
