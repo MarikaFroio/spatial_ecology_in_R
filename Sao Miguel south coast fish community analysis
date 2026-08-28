@@ -1,10 +1,3 @@
-> #### Marika Froio
->> ##### student n.
-
-
-
-
-
 
 #to set in english
 Sys.setlocale("LC_TIME", "C")
