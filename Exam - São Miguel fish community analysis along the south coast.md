@@ -154,4 +154,6 @@ theme(
   axis.text.y = element_text(size = 9),
   plot.title = element_text(face = "bold", hjust=0.5))
 ```
+![](mean%20abundance%20Rplot.png)
+
 
