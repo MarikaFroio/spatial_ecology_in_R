@@ -28,3 +28,130 @@ This study focuses on the southern coast of São Miguel, with the aim of investi
 ---
 
 # Data gathering and Methodology
+Data were collected through snorkeling surveys along 15 m transects, located at approximately the same distance from the coastline, at four different sites along the southern coast of São Miguel: Praia da Pedreira, Praia Ribeira das Tainhas, Praia Baixa d’Areia, and Praia do Pópulo.
+
+Sampling was conducted over a five-month period, with a total of five transects for each site.
+For each transect, the data recorded included fish species, relative abundance and body size, as well as the date and time of sampling and a set of environmental variables. 
+
+All collected data were organized and stored in an Excel file for subsequent analysis.
+
+---
+
+## language and working directory setup
+```md
+Sys.setlocale("LC_TIME", "C")
+setwd("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project")
+```
+## packages upload
+```md
+library("tidyverse")
+library("lubridate")
+library("vegan")
+library(dplyr)
+library(ggplot2)
+library(mapview)
+library(overlap)
+library(igraph)
+library(terra)
+```
+## file upload
+```md
+fish <- read.csv2("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project/sao miguel fish species.csv", fileEncoding = "Windows-1252")
+```
+## data check
+```md
+glimpse(fish)
+```
+## data correction
+```md
+fish[fish == ""] <- NA
+fish<- fish|> fill(site, date, visibility.m, tide, water.T..C, wave.height.m, wave.period.s, wave.power.kW.m, wind.km.h, level, time)
+fish$date<-dmy(fish$date)
+fish$abundances<-as.numeric(fish$abundances)
+fish$size.cm<-as.numeric(fish$size.cm)
+fish$visibility.m<-as.numeric(fish$visibility.m)
+fish$water.T..C<-as.numeric(fish$water.T..C)
+fish$wave.height.m<-as.numeric(fish$wave.height.m)
+fish$wave.power.kW.m<-as.numeric(fish$wave.power.kW.m)
+fish$wave.period.s<-as.numeric(fish$wave.period.s)
+fish$wind.km.h<-as.numeric(fish$wind.km.h)
+fish$time <- hm(fish$time)
+```
+## 1. STUDY OF SPECIES RICHNESS
+```md
+sc_richness <- fish |>
+  summarise(species_richness = n_distinct(fish.species))
+sc_richness
+# table with species names
+names_sc_richness <- fish |>
+  distinct(fish.species) |>
+  arrange(fish.species)
+names_sc_richness
+```
+|  | fish species|  | fish species|
+|---:|---|---:|---|
+| 1 |axillary wrasse        | 10 |portuguese blenny      |
+| 2 |pufferfish             | 11 |blue damselfish        |
+| 3 |rainbow wrasse         | 12 |bogue                  | 
+| 4 |saddled seabream       | 13 |dusky grouper juvenile |
+| 5 |salema                 | 14 |flounder               |
+| 6 |striped red mullet     | 15 |garfish                |
+| 7 |thicklip grey mullet   | 16 |madeira rockfish       |
+| 8 |two-banded seabream    | 17 |ornate wrasse          |
+|9 9|white seabream         | 18 |parrotfish             |
+
+## 2. STUDY OF MEAN ABUNDANCE OF EACH SPECIES
+```md
+mean_abundance_overall <- fish |>
+  group_by(fish.species) |>
+  summarise(
+    mean_abundance = mean(abundances, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  arrange(desc(mean_abundance))
+mean_abundance_overall
+```
+|fish.species           | mean_abundance|
+|:----------------------|--------------:|
+|salema                 |      38.8|
+|white seabream         |      34.2|
+|bogue                  |      20|
+|two-banded seabream    |       6.1|
+|rainbow wrasse         |       3|
+|thicklip grey mullet   |       3|
+|parrotfish             |       2.7|
+|dusky grouper juvenile |       2|
+|saddled seabream       |       2|
+|striped red mullet     |       1|
+|ornate wrasse          |       1.3|
+|axillary wrasse        |       1|
+|blue damselfish        |       1|
+|flounder               |       1|
+|garfish                |       1|
+|madeira rockfish       |       1|
+|portuguese blenny      |       1|
+|pufferfish             |       1|
+
+### Mean abundance heatmap
+```md
+ggplot(mean_abundance_overall,
+    aes(x = "abundance",y = reorder(fish.species, mean_abundance),
+    fill = mean_abundance)) +
+geom_tile(color = "white") +
+geom_text(
+    aes(label = round(mean_abundance, 2)),
+    color = "black",
+    size = 3.5) +
+scale_fill_gradient(low = "yellow", high = "orange") +
+labs(
+  x = NULL,
+  y = "Species",
+  fill = "Mean abundance gradient",
+  title = "Mean abundance of fish species") +
+theme_minimal() +
+theme(
+  axis.text.x = element_text(face = "bold"),
+  axis.text.y = element_text(size = 9),
+  plot.title = element_text(face = "bold", hjust=0.5))
+```
+
