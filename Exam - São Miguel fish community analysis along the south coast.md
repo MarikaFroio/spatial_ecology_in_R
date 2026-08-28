@@ -254,7 +254,7 @@ map_NT <- mapview(
   layer.name = "Thicklip grey mullet - Presence"
 ) +
   mapview(
-    sites[sites$Occurrence_NT == 0, "Occurrence_NT" ],
+    sites[sites$Occurrence_NT == 0, c("site", "Occurrence_NT") ],
     col.regions = "orange",
     cex = 8,
     layer.name = "Thicklip grey mullet - Absence"
