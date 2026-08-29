@@ -262,6 +262,154 @@ map_NT <- mapview(
 
 map_NT
 ```
-![](thicklipgreymullet2Rplot.png)
+![](thicklipgreymullet3Rplot.png)
 
+## DCA on fish community among sites
+```md
+# exctract values from spatvector
+fish_df <- values(fish_vect)
+
+
+#  creating transect value
+# site + date = transect
+fish_df$transect <- paste(
+  fish_df$site,
+  fish_df$date,
+  sep = "_"
+)
+
+
+# 2d matrix
+# rows = transect
+# columns = specie
+# values = abbondanze
+dca_matrix <- xtabs(
+  abundances ~ transect + fish.species,
+  data = fish_df
+)
+
+
+# turn NA into 0
+dca_matrix[is.na(dca_matrix)] <- 0
+
+# dimension check
+dim(dca_matrix)
+
+#  DCA
+dca <- decorana(dca_matrix)
+
+#  eigenvalues: they explain how important each DCA axis is when representing the differences in fish composition among sites
+dcal1 <- dca$evals[1]
+dcal2 <- dca$evals[2]
+dcal3 <- dca$evals[3]
+dcal4 <- dca$evals[4]
+
+total <- sum(c(dcal1, dcal2, dcal3, dcal4))
+
+#  DCA1 and DCA2 %
+percdca1 <- dcal1 * 100 / total
+percdca2 <- dcal2 * 100 / total
+
+#check
+percdca1
+percdca2
+
+# % DCA1 + DCA2
+percdca1 + percdca2
+
+#to see where the transects are in the graph
+transect_scores <- scores(
+  dca,
+  display = "sites")
+
+transect_scores
+```
+### Plot
+```md
+
+#matching the transect to the site
+transect_names <- unique(
+  fish_df[, c("transect", "site")]
+)
+
+# Put transects in the same order as in the DCA
+transect_names <- transect_names[
+  match(rownames(transect_scores),transect_names$transect),]
+
+#matching color to site
+point_colors <- rep("black",nrow(transect_scores))
+
+point_colors[transect_names$site %in% "Praia Baixa D'Areia"] <- "blue"
+
+point_colors[transect_names$site %in% "Praia da Pedreira"] <- "red"
+
+point_colors[transect_names$site %in% "Praia do Populo"] <- "green"
+
+point_colors[transect_names$site %in% "Praia Ribeira das Tainhas"] <- "orange"
+
+# check that there are 5 transects for each site
+table(point_colors)
+
+#set axis
+xlim <- max(abs(transect_scores[, "DCA1"])) * 1.1
+
+ylim <- max(abs(transect_scores[, "DCA2"])) * 1.1
+
+#set graph and legend area
+layout(matrix(c(1, 2),nrow = 2),heights = c(4, 2))
+
+#DCA graph
+par(mar = c(5, 4, 2, 2))
+
+plot(
+  transect_scores[, "DCA1"],
+  transect_scores[, "DCA2"],
+  type = "n",
+  xlim = c(-xlim, xlim),
+  ylim = c(-ylim, ylim),
+  xlab = "DCA1",
+  ylab = "DCA2"
+)
+# Lines crossing at zero
+abline(
+  h = 0,
+  v = 0,
+  col = "grey80",
+  lty = 2
+)
+# add transects as coloured points
+points(
+  transect_scores[, "DCA1"],
+  transect_scores[, "DCA2"],
+  pch = 19,
+  col = point_colors,
+  cex = 1.2
+)
+
+#legend
+par(
+  mar = c(0, 0, 0, 0)
+)
+
+plot.new()
+
+legend(
+  "center",
+  legend = c(
+    "Praia Baixa D'Areia",
+    "Praia da Pedreira",
+    "Praia do Populo",
+    "Praia Ribeira das Tainhas"
+  ),
+  col = c(
+    "blue",
+    "red",
+    "green",
+    "orange"
+  ),
+  pch = 19,
+  bty = "n",
+  cex = 0.9
+)
+```
 
