@@ -264,7 +264,7 @@ map_NT
 ```
 ![](thicklipgreymullet3Rplot.png)
 
-## DCA on fish community among sites
+## 4. DCA on fish community among sites
 ```md
 # exctract values from spatvector
 fish_df <- values(fish_vect)
@@ -412,4 +412,170 @@ legend(
   cex = 0.9
 )
 ```
+![](dcaRplot.png)
 
+## 5. ABUNDANCE CHANGE OVER 5 MONTHS OF THE 2 MOST ABUNDANT SPECIES
+```md
+#selection of species, dates and relative abundances - white seabream
+white_seabream<-fish[fish$fish.species=="white seabream",]
+white_seabream_date<-white_seabream$date
+white_seabream_abundance<-white_seabream$abundances
+
+#selection of dates, species and relative abundances - salema
+salema<-fish[fish$fish.species=="salema",]
+salema_date<-salema$date
+salema_abundance<-salema$abundances
+```
+### plots of abundance change over 5 month in white seabream and salema
+```md
+par(mfrow = c(1, 2),mar = c(4, 4, 3, 1))
+
+plot(white_seabream_date, white_seabream_abundance, xlab = "time", ylab = "abundance", main = "White Seabream - abundance change with date", cex.main = 0.7, cex.lab = 0.8)
+
+plot(salema_date, salema_abundance, xlab = "date", ylab = "abundance", main = "Salema - abundance change with date", cex.main = 0.7, cex.lab = 0.8)
+
+#to go back to singular plots
+par(mfrow = c(1, 1))
+```
+## 6. DETECTION FREQUENCY ANALYSIS 
+```md
+# White Seabream
+#transform date into numeric value
+white_seabream_date_numeric<-as.numeric(white_seabream_date)
+#kernel density
+wsb_linear_kd<-density(white_seabream_date_numeric)
+
+#Salema
+salema_date_numeric<-as.numeric(salema_date)
+#kernel density
+s_linear_kd<-density(salema_date_numeric)
+
+# comparison plot
+par(mfrow=c(1,1))
+
+plot(wsb_linear_kd,
+      col = "blue",
+      xaxt = "n",
+      xlab = "date",
+      ylab = "density",
+      main = "white seabream- salema kernel density overlap")
+ 
+lines(s_linear_kd, col = "red")
+ 
+axis(1, at = pretty(c(wsb_linear_kd$x, s_linear_kd$x)), labels = as.Date(pretty(c(wsb_linear_kd$x, s_linear_kd$x)), origin = "1970-01-01"))
+
+# Loop to check other species detection frequency
+fish_date_numeric <- as.numeric(fish$date)
+species_list <- unique(fish$fish.species)
+
+#plot
+par(mfrow = c(3, 3))
+for (species in species_list) {species_data <- fish[
+    fish$fish.species == species,]
+if (nrow(species_data) >= 2) { species_data$date_numeric <- as.numeric(
+      species_data$date)
+    linear_kd <- density(species_data$date_numeric)
+    
+    plot(linear_kd,
+         main = paste("Kernel density of date for", species),
+         xlab = "Date",
+         ylab = "density",
+         xaxt = "n",
+         cex.main = 0.7)
+    
+    axis(1,
+         at = pretty(species_data$date_numeric),
+         labels = as.Date(pretty(species_data$date_numeric),
+                          origin = "1970-01-01"), cex.axis = 0.7)}}
+# Return to one plot at a time
+par(mfrow = c(1, 1))
+```
+
+## 7. COMMUNITY GRAPH TO STUDY POTENTIAL SPATIAL/RESOURCE OVERLAP DEPENDING ON FISH SIZE AND ABUNDANCE
+```md
+#Calculating mean size and mean abundance for each species
+species_size <- fish %>%
+  select(fish.species, size.cm, abundances) %>%
+  group_by(fish.species) %>%
+  summarise(
+    mean_size = mean(size.cm, na.rm = TRUE),
+    mean_abundance = mean(abundances, na.rm = TRUE)
+  )
+
+#Creating big and small species categories based on mean size 
+big_species <- species_size %>%
+  filter(mean_size > 15) %>%
+  pull(fish.species)
+
+small_species <- species_size %>%
+  filter(mean_size <= 15) %>%
+  pull(fish.species)
+
+ #Creating interactions between big and small species 
+ interactions <- expand.grid(
+  big_species = big_species,
+  small_species = small_species
+)
+#Adding the mean size of the species
+interactions_big_size <- species_size$mean_size[match(interactions$big_species, species_size$fish.species)]
+
+interactions_small_size <- species_size$mean_size[match(interactions$small_species, species_size$fish.species)]
+
+#Calculating size difference
+interactions_size_difference <- abs(interactions_big_size - interactions_small_size)
+
+#Potential spatial/resource overlap
+#Smaller size difference = higher potential overlap
+interactions$overlap <- 1 / (1 + interactions_size_difference)
+
+# graph all size + all interactions
+interactions_graph <- graph_from_data_frame(
+  interactions[
+    ,
+    c(
+      "big_species",
+      "small_species",
+      "overlap"
+    )
+  ],
+  vertices = species_size$fish.species,
+  directed = FALSE
+)
+#nodes size
+V(interactions_graph)$size <- 8
+
+#edge thickness base on overlap
+E(interactions_graph)$width <-
+  E(interactions_graph)$overlap * 8
+
+#selection of strongest interactions
+strong_interactions <- interactions %>%
+  arrange(desc(overlap)) %>%
+  slice_head(n = 10)
+#species involved in strongest interactions
+label_species <- unique(
+  c(
+    strong_interactions$big_species,
+    strong_interactions$small_species
+  )
+)
+#show labels
+V(interactions_graph)$label <- ifelse(
+  V(interactions_graph)$name %in% label_species,
+  V(interactions_graph)$name,
+  ""
+)
+
+# plot
+plot(
+  interactions_graph,
+  vertex.color = "lightblue",
+  vertex.size = 8,
+  vertex.label = V(interactions_graph)$label,
+  vertex.label.cex = 0.8,
+  vertex.label.color = "black",
+  edge.color = "grey",
+  edge.width = E(interactions_graph)$width,
+  main = "Potential spatial/resource overlap among fish species"
+)
+```
