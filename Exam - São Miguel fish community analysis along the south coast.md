@@ -437,6 +437,7 @@ plot(salema_date, salema_abundance, xlab = "date", ylab = "abundance", main = "S
 #to go back to singular plots
 par(mfrow = c(1, 1))
 ```
+![](abundancedateRplot.png)
 ## 6. DETECTION FREQUENCY ANALYSIS 
 ```md
 # White Seabream
@@ -463,8 +464,10 @@ plot(wsb_linear_kd,
 lines(s_linear_kd, col = "red")
  
 axis(1, at = pretty(c(wsb_linear_kd$x, s_linear_kd$x)), labels = as.Date(pretty(c(wsb_linear_kd$x, s_linear_kd$x)), origin = "1970-01-01"))
-
+```
+![](kerneldensity2Rplot.png)
 # Loop to check other species detection frequency
+```md
 fish_date_numeric <- as.numeric(fish$date)
 species_list <- unique(fish$fish.species)
 
@@ -490,6 +493,9 @@ if (nrow(species_data) >= 2) { species_data$date_numeric <- as.numeric(
 # Return to one plot at a time
 par(mfrow = c(1, 1))
 ```
+### linear kernel density plots other speacies recorded at least twice
+![](densityall1Rplot.png)
+![](densityall2Rplot.png)
 
 ## 7. COMMUNITY GRAPH TO STUDY POTENTIAL SPATIAL/RESOURCE OVERLAP DEPENDING ON FISH SIZE AND ABUNDANCE
 ```md
@@ -579,3 +585,5 @@ plot(
   main = "Potential spatial/resource overlap among fish species"
 )
 ```
+### community interactions based on fish size plot
+![](interactionsRplot.png)
