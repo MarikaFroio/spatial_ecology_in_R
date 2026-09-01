@@ -20,9 +20,9 @@ Understanding these patterns is essential for improving knowledge and supporting
 
 This study focuses on the southern coast of São Miguel, with the aim of investigating the local fish community. The main analyses focus on:
 - **species richness** and **mean abundance** of the recorded species
-- **Species distribution**, with a focus on species classified as *Endangered* or *Near Threatened*   according to the IUCN Red List
-- **Temporal variation in species abundance** in relation to the time of day and sampling date over   a five-month period
-- **Detection patterns**, using kernel density estimation to identify periods with the highest        frequency of fish detections
+- **Species distribution**, with a focus on species classified as *Endangered* or *Near Threatened* according to the IUCN Red List
+- **Temporal variation in species abundance** in relation to sampling date over a five-month period
+- **Detection patterns**, using kernel density estimation to identify periods with the highest frequency of fish detections
 - **Potential indirect interactions**, exploring competition for space among species in     relation to body size and the spatial area they occupy
 
 ---
