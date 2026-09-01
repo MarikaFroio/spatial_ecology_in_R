@@ -1,20 +1,26 @@
-#to set directory
+# to set directory
 setwd("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project")
-#upload file
+# upload file
 fish <- read.csv2("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project/sao miguel fish species.csv", fileEncoding = "Windows-1252")
-#install packages that I might need (check if I need them)
+# install packages that I might need (check if I need them)
+```md
 install.packages(c("tidyverse", "lubridate", "vegan"))
-#tidyverse: to visualize, clean and change data
-#lubridate: to work with date and time
-#vegan: to make ecological analyses 
+# tidyverse: to visualize, clean and change data
+# lubridate: to work with date and time
+# vegan: to make ecological analyses 
 library("tidyverse")
 library("lubridate")
 library("vegan")
-#check data nature
+```
+# check data nature
+```md
 glimpse(fish)
-#count empty spaces as NA
+```md
+# count empty spaces as NA
 fish[fish == ""] <- NA
-# [] selects a part of the file. i want to change empty strings into null data
+#[] selects a part of the file. i want to change empty strings into null data
+```
+
 fish<- fish|> fill(site, date, visibility.m, tide, water.T..C, wave.height.m, wave.period.s, wave.power.kW.m, wind.km.h, level, time)
 #to apply the function to the following elements
 #transform data from chr
