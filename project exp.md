@@ -325,32 +325,39 @@ map_NT
 ```md
 # exctract values from spatvector
 fish_df <- values(fish_vect)
+# to create a DCA is better to work with a dataframe and not a spatvector because it doesn't use spatial data. so we extract the values from fish_vect and create fish_df
+# values() is a terra package function
 
-
-#  creating transect value
-# site + date = transect
+#creating transect value
+#site + date = transect
 fish_df$transect <- paste(
   fish_df$site,
   fish_df$date,
   sep = "_"
 )
+# creating the column transect
+# we use paste() (basic R function) to create a singular object with both information about site and date. If I had used c() it would have created a vector with separated info.
+# I could avoid using sep = "_"
 
 
 # 2d matrix
-# rows = transect
-# columns = specie
-# values = abbondanze
+#rows = transect
+#columns = species
+#values = abundances
+
 dca_matrix <- xtabs(
   abundances ~ transect + fish.species,
   data = fish_df
 )
-
+# I am creating the matrix for the DCA using the R base function xtabs(). The matrix is structured with transects as rows, fish species as columns, and their corresponding abundances as values. All the information is extracted from fish_df.
 
 # turn NA into 0
 dca_matrix[is.na(dca_matrix)] <- 0
+# in some cases there might not be a value recorded for a combination of transect and species so we are using is.na() R basic function to find those missing values and turn them into 0
 
 # dimension check
 dim(dca_matrix)
+# dim() basic R function that tells the number of rows and columns for the dataframe
 
 #  DCA
 dca <- decorana(dca_matrix)
