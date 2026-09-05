@@ -47,23 +47,23 @@ fish$wind.km.h<-as.numeric(fish$wind.km.h)
 fish$time <- hm(fish$time)
 # hm() lubridate package function that converts time in a format that R understands
 ```
-## 1. STUDY OF SPECIES RICHNESS
+### 1. STUDY OF SPECIES RICHNESS
 ```md
 sc_richness <- fish |>
   summarise(species_richness = n_distinct(fish.species))
 #I could also just write
 sc_richness <- summarise(fish, species_richness = n_distinct(fish.species))
 
-#this code tells R to summarise the dataset fish, detect all the different values in the column fish.species and create a column called species_richness and then put everything inside an object called sc_richness
+# this code tells R to summarise the dataset fish, detect all the different values in the column fish.species and create a column called species_richness and then put everything inside an object called sc_richness. all dplyr functions
 
 sc_richness
 
-# table with species names
+## table with species names
 names_sc_richness <- fish |>
   distinct(fish.species) |>
   arrange(fish.species)
 
-#distinc() is to distinguish the different species based on the name and arrange() puts them in alphabetical order
+# distinc() is to distinguish the different species based on the name and arrange() puts them in alphabetical order. they're all dplyr functions
 
 #or I could also write
 names_sc_richness <- arrange(
@@ -87,7 +87,7 @@ knitr::kable(names_sc_richness)
 | 8 |two-banded seabream    | 17 |ornate wrasse          |
 |9 9|white seabream         | 18 |parrotfish             |
 
-## 2. STUDY OF MEAN ABUNDANCE OF EACH SPECIES
+### 2. STUDY OF MEAN ABUNDANCE OF EACH SPECIES
 ```md
 mean_abundance_overall <- fish |>
   group_by(fish.species) |>
@@ -95,7 +95,7 @@ mean_abundance_overall <- fish |>
     .groups = "drop") |>
   arrange(desc(mean_abundance))
 
-#group_by() creates a groups the data based on the species, then summarise() creates a result containing mean_abundance which is the mean value of all abundances for each species and then arrange() orders the result from species with highest to lowest abundance. (MAYBE NA.RM = TRUE COULD BE REMOVED)
+# group_by() is a dplyr function that creates a groups the data based on the species, then summarise() is a dplyr function that creates a result containing mean_abundance which is the mean value of all abundances for each species and then arrange() (dplyr function) orders the result from species with highest to lowest abundance. (MAYBE NA.RM = TRUE COULD BE REMOVED)
 
 mean_abundance_overall
 
@@ -122,30 +122,40 @@ knitr::kable(mean_abundance_overall)
 |portuguese blenny      |       1|
 |pufferfish             |       1|
 
-### Mean abundance heatmap
+## Mean abundance heatmap
 ```md
 ggplot(mean_abundance_overall,
-    aes(x = "abundance",y = reorder(fish.species, mean_abundance), #y=rorder... puts species on the y axis and orders them based on their mean abundance
-    fill = mean_abundance)) #fill means that the color of the tile depends on the mean abundance (and creates the gradient on the side)
+    aes(x = "abundance",y = reorder(fish.species, mean_abundance),
+# y=rorder... is a basic R function that puts species on the y axis and orders them based on their mean abundance
+    fill = mean_abundance))
+# fill means that the color of the tile depends on the mean abundance (and creates the gradient on the side)
  +
-geom_tile(color = "white") #geom_tile creates rectangular tiles with a white line between them COULD AVOID IT
+geom_tile(color = "white")
+# geom_tile creates rectangular tiles with a white line between them COULD AVOID IT
 +
-#geom_text writes the text on the graph. aes is aesthetic mappings and controls which variables are used to create the graph. color and size are fixed settings so they are not part of aes
+# geom_text writes the text on the graph. aes is aesthetic mappings and controls which variables are used to create the graph. color and size are fixed settings so they are not part of aes
 geom_text(
-    aes(label = round(mean_abundance, 2)), #round (mean...) rounds to 2 decimals, could be label=mean_abundance
+    aes(label = round(mean_abundance, 2)),
+# round (mean...) is a basic R function that rounds to 2 decimals, could be label=mean_abundance
     color = "black",
     size = 3.5) +
-scale_fill_gradient(low = "yellow", high = "orange") +
+scale_fill_gradient(low = "yellow", high = "orange")
+# scale_fill-gradient is a ggplot2 function that assigns a color to low and high values +
 labs(
   x = NULL,
   y = "Species",
   fill = "Mean abundance gradient",
-  title = "Mean abundance of fish species") +
-theme_minimal() +
+  title = "Mean abundance of fish species")
+# labs is a ggplot2 function used for setting labels and heads of graphs. x:null means no label for x axis, fill: is the head of legend for color gradient
++
+theme_minimal()
+# minimalist style
++
 theme(
   axis.text.x = element_text(face = "bold"),
   axis.text.y = element_text(size = 9),
   plot.title = element_text(face = "bold", hjust=0.5))
+# to adjust the aesthetic of the graph, like bold letters, size and centered text--> hjust=0.5
 ```
 ![](mean%20abundance%20Rplot.png)
 
@@ -168,22 +178,49 @@ coordinates <- data.frame(
     -25.4096397,
     -25.5179964,
     -25.6157604))
+# all basic R functions. we create a data frame so we can have an organized table with associations already made and it will be easier to merge it with the fish data frame. c() creates a vector of values. latitude and longitude values are taken from google earth. 
 
 #combining dataset and coordinates
 fish <- merge(fish, coordinates, by = "site")
+# merge() is a basic R function that puts together the 2 dataframes fish and coordinates using the common column "site", meaning that now in fish dataframe we will also have the coordinates associated to the sites.
+
 #check names
 names(fish)
+# basic R function used to check the names of the column because now the coordinates could have a different name. .x and .y doesn't mean latitude or longitude, it's just a random letter used to change the name.
+
 #transforming the dataset into a Spatvector
 fish_vect <- vect(
   fish,
   geom = c("longitude.y", "latitude.x"),
   crs = "EPSG:4326")
+# vect() is a terra function that transforms the dataframe fish into a SpatVector, which is still a dataframe but with spatial characteristics.
+# geom() is an argument of vect (to check I could do args(vect)), it stands for geometry and is used to tell vect() which columns to use as coordinates
+# crs is another vect() argument which specifies the geographic reference system. it corresponds to WGS 84 coordinates (World Geodetic System 1984), used to express a location on earth in latitude and longitude. I know that i have to use "EPSG:4326" because it is the code associated for WGS 84 and google earth uses this kind.
 
 #extracting the 4 sites
 sites <- fish_vect[!duplicated(fish_vect$site), ]
+# the syntax [] is a basic R object that allows to select certains values.
+# duplicated() is also a basic R function that finds duplicated values. by putting ! in front which means not we are choosing only non duplicated values
+#I DIDN'T USE UNIQUE() BECAUSE THIS FUNCTION GIVES BACK DIRECTLY THE VALUES WITHOUT DUPLICATES, SO JUST THE SINGLE SITE NAMES. DUPLICATED() INSTEAD WORKS BETTER WITH ROWS AND ALLOWS ME TO KEEP ALL THE INFO ASSOCIATED TO THE ROW.
+# $site selects the column site
+# the ored is [rows, columns] so we choose which rows we want but we keep columns "empty" so that we keep all columns associated to those rows (like the coordinates)
+
 #choosing 1st species
 EN_sites <- unique(
   fish_vect$site[fish_vect$fish.species == "dusky grouper juvenile "])
+# i am creating just a vector with the names of the sites where I recored the species so I can use the basic function of R unique() which gives me the different names jsut 1 time
+# inside unique I put only the column site of the spatvector fish_vect
+# and I select only the data related to the species I want in the column fish.species of the spatvector fish_vect
+
+#if I wanted to create directly a spatial object I could have used:
+EN_sites <- fish_vect[
+  fish_vect$fish.species == "dusky grouper juvenile " &
+  !duplicated(fish_vect$site),
+]
+
+sites$Occurrence_EN <- 0
+sites$Occurrence_EN[sites$site %in% EN_sites$site] <- 1
+
 #choosing 2nd species
 NT_sites <- unique(
   fish_vect$site[fish_vect$fish.species == "thicklip grey mullet"])
@@ -193,6 +230,10 @@ sites$Occurrence_EN <- 0
 sites$Occurrence_EN[
   sites$site %in% EN_sites
 ] <- 1
+# I am assigning a 0 or 1 value to certain elements of a column
+# I am creating the column Occurrence_EN and first everything has value 0
+# then in that column I select all the objects associates to the column sites and if they appear in the vector EN_sites as well then the value is 1. %in% is an R operator that tells if a value is part of a group of values
+
 #check
 sites$Occurrence_EN
 
@@ -204,13 +245,17 @@ sites$Occurrence_NT[
 #check
 sites$Occurrence_NT
 
+# NOT NECESSARY
 #data frame dusky grouper/thicklip grey mullet occurrence
 EN_occurrence_df <- as.data.frame(sites$Occurrence_EN)
 NT_occurrence_df <- as.data.frame(sites$Occurrence_NT)
+# NOT NECESSARY
 
 #presence and absence duskygrouper
 pres_EN <- sites[sites$Occurrence_EN == 1,]
 abse_EN <- sites[sites$Occurrence_EN == 0,]
+
+# selecting only values 1 for presence and values 0 for absence in sites spatvector
 
 #presence and absence thicklip grey mullet
 pres_NT <- sites[sites$Occurrence_NT == 1,]
@@ -231,6 +276,25 @@ map_EN <- mapview(
     cex = 8,
     layer.name = "Dusky grouper juvenile - Absence"
 )
+# mapview() is a function of the mapview package that represents an object on a map.
+# we are representing sites: the rows are the presences and absences and the columns are sites and occurrence
+# col.regions is a mapview argument that assigns a color to certain point or regions on the map
+# layer.name is a mapview argument that gives a name to the layer of the map
+
+# OPPURE
+mapview(
+  pres_EN[, c("site", "Occurrence_EN")],
+  col.regions = "blue",
+  cex = 8,
+  layer.name = "Dusky grouper juvenile - Presence"
+)+
+mapview(
+  abse_EN[, c("site", "Occurrence_EN")],
+  col.regions = "red",
+  cex = 8,
+  layer.name = "Dusky grouper juvenile - Absence"
+)
+
 
 map_EN
 ```
