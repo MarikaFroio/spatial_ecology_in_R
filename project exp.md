@@ -720,19 +720,27 @@ interactions_graph <- graph_from_data_frame(
     )
   ],
   vertices = species_size$fish.species,
-  directed = FALSE
-)
+  directed = FALSE)
+# graph_from_data_frame() is a function from the igraph package that creates a graph starting from a dataframe. the graphs usually has vertices (nodes) and edges (connections)
+# I'm using the interactions dataframe and I'm selecting the columns big_specie, small_species and overlap
+# the vertices are the species names from species_size vector
+# directed=FALSE means that there is no specific direction in the interaction, it goes both ways
+
 #nodes size
 V(interactions_graph)$size <- 8
+# V() is an igraph function that refers to nodes
 
 #edge thickness base on overlap
 E(interactions_graph)$width <-
   E(interactions_graph)$overlap * 8
+# E() is an igraph function that refers to edges
+# we are selecting the width of the edge representing the interaction and saying that it should be the value of the overlap associated to that interaction multiplied by 8
 
 #selection of strongest interactions
 strong_interactions <- interactions %>%
   arrange(desc(overlap)) %>%
   slice_head(n = 10)
+
 #species involved in strongest interactions
 label_species <- unique(
   c(
