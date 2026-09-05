@@ -660,18 +660,24 @@ par(mfrow = c(1, 1))
 ## 7. COMMUNITY GRAPH TO STUDY POTENTIAL SPATIAL/RESOURCE OVERLAP DEPENDING ON FISH SIZE AND ABUNDANCE
 ```md
 #Calculating mean size and mean abundance for each species
-species_size <- fish %>%
+species_size <- fish %>% # i can also use |>
   select(fish.species, size.cm, abundances) %>%
+# I'm selecting only the columns I'm interested in
   group_by(fish.species) %>%
+# I'm dividing the data into groups based on the species
   summarise(
     mean_size = mean(size.cm, na.rm = TRUE),
-    mean_abundance = mean(abundances, na.rm = TRUE)
-  )
+    mean_abundance = mean(abundances, na.rm = TRUE))
+# summarise() sums up the data creating 1 line per group generally where we put the mean size and abundance
+#  na.rm = TRUE to ignore missing values
 
 #Creating big and small species categories based on mean size 
-big_species <- species_size %>%
+big_species <- species_size %>% # I could use |>
+# we start from the species_size object (which also contains species abundances)
   filter(mean_size > 15) %>%
+# filter() selects certain rows. in this case the rows with size bigger than 15 cm
   pull(fish.species)
+# pull() extract a single column from a table and transforms it into a vector. in this case it is the species column
 
 small_species <- species_size %>%
   filter(mean_size <= 15) %>%
@@ -680,19 +686,28 @@ small_species <- species_size %>%
  #Creating interactions between big and small species 
  interactions <- expand.grid(
   big_species = big_species,
-  small_species = small_species
-)
+  small_species = small_species)
+# expand.grid() creates all possible combinations between the given objects. in this case we want all possible combinations between big and small species. we are creating 2 columns with the same name as the object we created and selected
+
 #Adding the mean size of the species
 interactions_big_size <- species_size$mean_size[match(interactions$big_species, species_size$fish.species)]
+# we take the column mean_size from species_size
+# match() for each species of the column big_species from the interactions object, select the same species in species_size (and give me its mean size)
 
 interactions_small_size <- species_size$mean_size[match(interactions$small_species, species_size$fish.species)]
 
 #Calculating size difference
 interactions_size_difference <- abs(interactions_big_size - interactions_small_size)
+# abs() means absolute value and erases the negative value (might not be necessary and i can just write the difference without () )
+# this code calculates the difference of mean size between big and small species for each interaction
 
 #Potential spatial/resource overlap
 #Smaller size difference = higher potential overlap
 interactions$overlap <- 1 / (1 + interactions_size_difference)
+# I'm creating a new column called overlap inside interactions
+# we add 1 to avoid a division with 0 in case there is no difference
+# 1/ creates a value that decreases with the increase of size difference
+# so we have less overlap for species with high size difference
 
 # graph all size + all interactions
 interactions_graph <- graph_from_data_frame(
