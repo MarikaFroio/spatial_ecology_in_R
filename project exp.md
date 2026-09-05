@@ -361,6 +361,7 @@ dim(dca_matrix)
 
 #  DCA
 dca <- decorana(dca_matrix)
+# decorana() is a vegan package function that executes the detrended correspondence analysis on the matrix that I created
 
 #  eigenvalues: they explain how important each DCA axis is when representing the differences in fish composition among sites
 dcal1 <- dca$evals[1]
@@ -369,10 +370,17 @@ dcal3 <- dca$evals[3]
 dcal4 <- dca$evals[4]
 
 total <- sum(c(dcal1, dcal2, dcal3, dcal4))
+# I am extracting the eingenvalues for 4 axis and then I consider the sum as 100%
+
+# to check how many values I have I could do:
+length(dca$evals)
+# and if I want to use them all in my calculation:
+total <- sum(dca$evals)
 
 #  DCA1 and DCA2 %
 percdca1 <- dcal1 * 100 / total
 percdca2 <- dcal2 * 100 / total
+# to know what percentage of the total value is represented by dca1 or dca2. it might be possible that the first 2 are the most representative and important, they might show the highest difference between the data
 
 #check
 percdca1
@@ -380,11 +388,15 @@ percdca2
 
 # % DCA1 + DCA2
 percdca1 + percdca2
+# it is the sum of the 2 percentages. I could also name it as sum_percdca, if I don't give it a name R doesn't save it
 
 #to see where the transects are in the graph
 transect_scores <- scores(
   dca,
   display = "sites")
+# scores() is a fucntion of the vegan package that extracts the coordinates of my dca
+# display = sites doesn't refer to my sites but is a vegan argument that displays the coordinats of my transects
+# so in transect_scores I am saving the dca coordinates (on the graph) of my transects
 
 transect_scores
 ```
@@ -395,15 +407,26 @@ transect_scores
 transect_names <- unique(
   fish_df[, c("transect", "site")]
 )
+# I could also write
+transect_names<- fish_df |>
+  distinct(transect, site)
+
+# in both cases I'm taking only different objects 1 time and extracting from fish_df the columns transect and site. i want to know which site each transect belongs to
 
 # Put transects in the same order as in the DCA
 transect_names <- transect_names[
   match(rownames(transect_scores),transect_names$transect),]
+# rownames(transect_scores) has the transect names in the order they show up in the dca
+# match() looks for the names in transect_names$transect column and correlates them to transect_scores
 
 #matching color to site
 point_colors <- rep("black",nrow(transect_scores))
+# first we create a vector with all points colored in black
+# nrow() counts how many transects we have
+# rep(black) creates a vector with as many black as the transects
 
 point_colors[transect_names$site %in% "Praia Baixa D'Areia"] <- "blue"
+# then we change the color based on the name of the site (point_colors and transect_names were not correlated before)
 
 point_colors[transect_names$site %in% "Praia da Pedreira"] <- "red"
 
@@ -413,11 +436,16 @@ point_colors[transect_names$site %in% "Praia Ribeira das Tainhas"] <- "orange"
 
 # check that there are 5 transects for each site
 table(point_colors)
+# function that counts how many times a value is repeated
 
 #set axis
 xlim <- max(abs(transect_scores[, "DCA1"])) * 1.1
 
 ylim <- max(abs(transect_scores[, "DCA2"])) * 1.1
+# from the table of transect_scores, we are taking the values of the columns DCA1 and DCA2
+# we transform the values in all positive with abs() because then we will find the farthest value from 0 with max()
+# *1.1 is to implement the value of 10% so we have more space in the graph
+# Take all the DCA coordinates of the transects → find the one farthest from 0 → increase that distance by 10% → use the result to set the axis limits.
 
 #set graph and legend area
 layout(matrix(c(1, 2),nrow = 2),heights = c(4, 2))
