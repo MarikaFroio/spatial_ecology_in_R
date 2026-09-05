@@ -740,20 +740,24 @@ E(interactions_graph)$width <-
 strong_interactions <- interactions %>%
   arrange(desc(overlap)) %>%
   slice_head(n = 10)
+# to select the 10 strongest interactions
+# arrange() orders the rows of the dataframe
+# desc() means in decreasing order
+# so  arrange(desc(overlap)) orders interactions from the one with the highest overlap to the one with the lowest
+# slice_head(10) selects the first 10 rows of the dataframe
 
 #species involved in strongest interactions
 label_species <- unique(
-  c(
-    strong_interactions$big_species,
-    strong_interactions$small_species
-  )
-)
+  c(strong_interactions$big_species,
+    strong_interactions$small_species))
+# we take the big and small species from the strong interactions and eliminate the duplicates with the function unique ()
+
 #show labels
 V(interactions_graph)$label <- ifelse(
   V(interactions_graph)$name %in% label_species,
-  V(interactions_graph)$name,
-  ""
-)
+  V(interactions_graph)$name, "")
+# ifelse() puts a condition. if the name of the species is in label_species then show the name, otherwise keep it empty ""
+# we created the $label attribute/column
 
 # plot
 plot(
@@ -765,8 +769,7 @@ plot(
   vertex.label.color = "black",
   edge.color = "grey",
   edge.width = E(interactions_graph)$width,
-  main = "Potential spatial/resource overlap among fish species"
-)
+  main = "Potential spatial/resource overlap among fish species")
 ```
 ### community interactions based on fish size plot
 ![](interactionsRplot.png)
