@@ -455,6 +455,8 @@ layout(matrix(c(1, 2),nrow = 2),heights = c(4, 2))
 
 #DCA graph
 par(mar = c(5, 4, 2, 2))
+# par() is a basic R function that modifies the graph settings
+# mar = c() is the function used to set the margins of the graph in the order: bottom, left, top, right. so we're leaveing more space on the bottom and on the left
 
 plot(
   transect_scores[, "DCA1"],
@@ -465,6 +467,10 @@ plot(
   xlab = "DCA1",
   ylab = "DCA2"
 )
+# we're creating the structure of the graph without putting the points yet. type="n" means without points
+# the axes are set with both negative and positive values
+# then we add the lables to the axes
+
 # Lines crossing at zero
 abline(
   h = 0,
@@ -472,6 +478,9 @@ abline(
   col = "grey80",
   lty = 2
 )
+# abline() is a basic R function that adds lines to the graph: h is the orizontal and v the vertical
+# lty= 2 sets the scattered line
+
 # add transects as coloured points
 points(
   transect_scores[, "DCA1"],
@@ -480,13 +489,30 @@ points(
   col = point_colors,
   cex = 1.2
 )
-
-#legend
-par(
-  mar = c(0, 0, 0, 0)
+# pch = 19 selects a full point
+# to check other symbols
+plot(
+  1:25,
+  rep(1, 25),
+  pch = 1:25,
+  cex = 2
 )
 
+text(
+  1:25,
+  rep(0.8, 25),
+  labels = 1:25
+)
+# or
+?points
+
+
+#legend
+par(mar = c(0, 0, 0, 0))
+# all margins are at 0
+
 plot.new()
+# creates an empty working space in the second area
 
 legend(
   "center",
@@ -504,8 +530,13 @@ legend(
   ),
   pch = 19,
   bty = "n",
-  cex = 0.9
+  cex = 0.9 (character expansion)
 )
+# center: is the position of the legend
+# legend = c() adds the name of the sites
+# col=c() adds the color of each site
+# pch= 19 adds the symbol (plotting character)
+# bty="n" erases the outline of the legend (box type)
 ```
 ![](dcaRplot.png)
 
@@ -513,8 +544,13 @@ legend(
 ```md
 #selection of species, dates and relative abundances - white seabream
 white_seabream<-fish[fish$fish.species=="white seabream",]
+# selection of all columns only related to rows with white seabream
+
 white_seabream_date<-white_seabream$date
+# selection of the column date inside the dataframe with only white seabream data
+
 white_seabream_abundance<-white_seabream$abundances
+# selection of the column abundances inside the dataframe with only white seabream data
 
 #selection of dates, species and relative abundances - salema
 salema<-fish[fish$fish.species=="salema",]
@@ -524,6 +560,8 @@ salema_abundance<-salema$abundances
 ### plots of abundance change over 5 month in white seabream and salema
 ```md
 par(mfrow = c(1, 2),mar = c(4, 4, 3, 1))
+# par () to set the graph
+# mfrow() is the funcion multi-frame by rows and is used to create a graph with 1 row and 2 columns which means to put 2 graphs next to each other.
 
 plot(white_seabream_date, white_seabream_abundance, xlab = "time", ylab = "abundance", main = "White Seabream - abundance change with date", cex.main = 0.7, cex.lab = 0.8)
 
@@ -538,8 +576,11 @@ par(mfrow = c(1, 1))
 # White Seabream
 #transform date into numeric value
 white_seabream_date_numeric<-as.numeric(white_seabream_date)
+#as.numeric is an R function that transforms a value into a number
+
 #kernel density
 wsb_linear_kd<-density(white_seabream_date_numeric)
+# density() is used to estimate the probability distribution of a numeric variable. In practice, it creates an estimate of the density the data, which can then be represented graphically.
 
 #Salema
 salema_date_numeric<-as.numeric(salema_date)
@@ -548,6 +589,7 @@ s_linear_kd<-density(salema_date_numeric)
 
 # comparison plot
 par(mfrow=c(1,1))
+# (1,1) means that I want just 1 graph
 
 plot(wsb_linear_kd,
       col = "blue",
@@ -555,27 +597,50 @@ plot(wsb_linear_kd,
       xlab = "date",
       ylab = "density",
       main = "white seabream- salema kernel density overlap")
- 
+ # xaxt="n" means that I don't want the x axis to be automatically represented
+
 lines(s_linear_kd, col = "red")
+# lines() add a line on the already existing graph
  
 axis(1, at = pretty(c(wsb_linear_kd$x, s_linear_kd$x)), labels = as.Date(pretty(c(wsb_linear_kd$x, s_linear_kd$x)), origin = "1970-01-01"))
+# axis(1) means inferior axis
+# pretty() is used to select the values where to put the lines on the graph
+# c(...$x, ...$x) means that i want the x values of both densities
+# as.Date(....) we basically take the same values from the densities we are representing but they have to be written in the format origin = .... because we converted them in numbers previously
+
 ```
 ![](kerneldensity2Rplot.png)
 # Loop to check other species detection frequency
 ```md
+# NOT NECESSARY
 fish_date_numeric <- as.numeric(fish$date)
+# NOT NECESSARY
+
 species_list <- unique(fish$fish.species)
+# we transform all dates into numebers and select the species only once
 
 #plot
 par(mfrow = c(3, 3))
-for (species in species_list) {species_data <- fish[
+for (species in species_list)
+# this means for each species contained in species_list do the following things
+{species_data <- fish[
     fish$fish.species == species,]
-if (nrow(species_data) >= 2) { species_data$date_numeric <- as.numeric(
+# create the object species_data which has all the info related to the species of the dataframe, one after the other
+
+if (nrow(species_data) >= 2)
+# this means only if I have at least 2 observations for species_data
+
+{ species_data$date_numeric <- as.numeric(
       species_data$date)
+# transforming the species_data date in a numeric value
+
     linear_kd <- density(species_data$date_numeric)
+# linear density for each species data numeric date
     
     plot(linear_kd,
          main = paste("Kernel density of date for", species),
+# paste() puts together different text elements, we are putting the same title to each graph with onlt the name of the species changing
+
          xlab = "Date",
          ylab = "density",
          xaxt = "n",
