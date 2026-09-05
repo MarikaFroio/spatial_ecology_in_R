@@ -449,6 +449,9 @@ ylim <- max(abs(transect_scores[, "DCA2"])) * 1.1
 
 #set graph and legend area
 layout(matrix(c(1, 2),nrow = 2),heights = c(4, 2))
+# layout() creates different areas in the plot area. basic R function
+# matrix (c(1,2), nrow=2) creates a matrix with 2 rows corresponding to the 2 areas, the first one for the graph and the second for the legend
+# heights=c(4,2) sets the height of the area, the first one is higher than the second
 
 #DCA graph
 par(mar = c(5, 4, 2, 2))
