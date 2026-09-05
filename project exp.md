@@ -1,23 +1,46 @@
 ## language and working directory setup
 ```md
 Sys.setlocale("LC_TIME", "C")
+# Sys.setlocale() means set  local system
+# LC_TIME specifies that I want to change the settings related to date and time
+# C sets the local standard to english
+
 setwd("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project")
 ```
 ## packages upload
 ```md
 library("tidyverse")
+# A collection of R packages used for data manipulation, cleaning, visualization, and analysis. It includes packages such as dplyr, ggplot2, tidyr, and readr
+
 library("lubridate")
+# Used to work with dates and times. It makes it easier to convert, extract, compare, and manipulate dates
+
 library("vegan")
+# Mainly used for ecological and community ecology analyses, such as species diversity, species abundance, ordination, and multivariate analysis
+
 library(dplyr)
+#Used for data manipulation. It provides functions such as filter(), select(), group_by(), summarise(), and arrange(). not necessary because I already have tidyverse
+
 library(ggplot2)
+#Used to create data visualizations and graphs, based on the Grammar of Graphics. not necessary because I already have tidyverse
+
 library(mapview)
+# Used to create interactive maps, especially for visualizing spatial data and geographic objects
+
 library(overlap)
+# Used to estimate and compare probability density distributions, particularly useful for measuring overlap between activity or temporal distributions
+
 library(igraph)
+#Used to create and analyze networks and graphs. In this project, it represents species as nodes and interactions between species as edges
+
 library(terra)
+Used for spatial data analysis, particularly for working with raster and vector geographic data such as maps, coordinates, and spatial objects
 ```
 ## file upload
 ```md
 fish <- read.csv2("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project/sao miguel fish species.csv", fileEncoding = "Windows-1252")
+# read.csv2() is used to read excel data but in my case it is probably better to use read.cvs(, sep =";") because the decimals are expressed with "." even though the columns are separated with ";"
+# fileEncoding tells R how to read the data. in this case we have to put windows-1252 because on the document we see ANSI
 ```
 ## data check
 ```md
@@ -43,6 +66,16 @@ fish$wave.power.kW.m<-as.numeric(fish$wave.power.kW.m)
 fish$wave.period.s<-as.numeric(fish$wave.period.s)
 fish$wind.km.h<-as.numeric(fish$wind.km.h)
 # as.numeric basic function of R that transforms values into numbers
+
+# in this project specifically
+tidyverse / dplyr  → data manipulation
+lubridate          → dates
+overlap            → temporal/density overlap
+igraph             → species interaction network
+terra              → spatial data
+mapview            → interactive maps
+vegan              → ecological analysis
+ggplot2             → graphs and visualization
 
 fish$time <- hm(fish$time)
 # hm() lubridate package function that converts time in a format that R understands
