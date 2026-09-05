@@ -35,6 +35,11 @@ library(igraph)
 
 library(terra)
 Used for spatial data analysis, particularly for working with raster and vector geographic data such as maps, coordinates, and spatial objects
+
+# NOT USED
+library(knitr)
+# knitr is an R package used to combine R code, results, tables, and figures into dynamic reports and documents, such as R Markdown
+# NOT USED
 ```
 ## file upload
 ```md
@@ -107,6 +112,8 @@ names_sc_richness <- arrange(
 names_sc_richness
 
 knitr::kable(names_sc_richness)
+# kable() is a function from the knitr package used to format data as a clean, readable table
+# :: is used to access a function or object from a specific package without loading the whole package with library()
 ```
 |  | fish species|  | fish species|
 |---:|---|---:|---|
