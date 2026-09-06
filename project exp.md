@@ -92,7 +92,7 @@ sc_richness <- fish |>
 #I could also just write
 sc_richness <- summarise(fish, species_richness = n_distinct(fish.species))
 
-# this code tells R to summarise the dataset fish, detect all the different values in the column fish.species and create a column called species_richness and then put everything inside an object called sc_richness. all dplyr functions
+# this code tells R to summarise the dataset fish, detect all the different values in the column fish.species and create a column called species_richness and then put everything inside an object called sc_richness. all dplyr functions. we use summarise because we want just 1 value
 
 sc_richness
 
