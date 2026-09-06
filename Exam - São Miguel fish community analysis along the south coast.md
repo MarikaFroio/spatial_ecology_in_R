@@ -506,7 +506,7 @@ if (nrow(species_data) >= 2) { species_data_numeric <- as.numeric(
 # Return to one plot at a time
 par(mfrow = c(1, 1))
 ```
-### linear kernel density plots other species recorded at least twice
+### linear kernel density plots for other species - recorded at least twice
 ![](densityall1Rplot.png)
 ![](densityall2Rplot.png)
 
