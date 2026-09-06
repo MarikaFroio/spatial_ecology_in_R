@@ -547,7 +547,7 @@ interactions_size_difference <- abs(interactions_big_size - interactions_small_s
 #Smaller size difference = higher potential overlap
 interactions$overlap <- 1 / (1 + interactions_size_difference)
 
-# graph all size + all interactions
+# interaction graph
 interactions_graph <- graph_from_data_frame(interactions[,c("big_species","small_species","overlap")],
   vertices = species_size$fish.species,
   directed = FALSE)
