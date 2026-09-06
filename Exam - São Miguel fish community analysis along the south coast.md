@@ -227,13 +227,13 @@ abse_NT <- sites[sites$Occurrence_NT == 0,]
 ### Dusky Grouper (EN) presence-absence map
 ```md
 map_EN <- mapview(
-  sites[sites$Occurrence_EN == 1, c("site", "Occurrence_EN")],
+  pres_EN[, c("site", "Occurrence_EN")],
   col.regions = "blue",
   cex = 8,
   layer.name = "Dusky grouper juvenile - Presence"
 ) +
   mapview(
-    sites[sites$Occurrence_EN == 0, c("site", "Occurrence_EN") ],
+    abse_EN[, c("site", "Occurrence_EN") ],
     col.regions = "red",
     cex = 8,
     layer.name = "Dusky grouper juvenile - Absence"
@@ -248,13 +248,13 @@ map_EN
 ### Thicklip Grey Mullet (NT) presence-absence map
 ```md
 map_NT <- mapview(
-  sites[sites$Occurrence_NT == 1, c("site", "Occurrence_NT")],
+  pres_NT[, c("site", "Occurrence_NT")],
   col.regions = "green",
   cex = 8,
   layer.name = "Thicklip grey mullet - Presence"
 ) +
   mapview(
-    sites[sites$Occurrence_NT == 0, c("site", "Occurrence_NT") ],
+    abse_NT[, c("site", "Occurrence_NT") ],
     col.regions = "orange",
     cex = 8,
     layer.name = "Thicklip grey mullet - Absence"
