@@ -271,8 +271,7 @@ map_NT
 *Figure 3. Presence-absence distribution of thicklip grey mullet across the study sites.*
 ## 4. DCA ON FISH COMMUNITY AMONG SITES
 ```md
-#  creating transect value
-# site + date = transect
+#creating transect value
 fish$transect <- paste(
   fish$site,
   fish$date,
@@ -280,27 +279,23 @@ fish$transect <- paste(
 )
 
 
-# 2d matrix
-# rows = transect
-# columns = species
-# values = abundances
+#2d matrix
 dca_matrix <- xtabs(
   abundances ~ transect + fish.species,
   data = fish
 )
 
 
-# turn NA into 0
+#turn NA into 0
 dca_matrix[is.na(dca_matrix)] <- 0
 
-# dimension check
+#dimension check
 dim(dca_matrix)
 
-#  DCA
+#DCA
 dca <- decorana(dca_matrix)
 
-#  eigenvalues: they explain how important each DCA axis is when representing the differences in fish composition among sites
-# to check how many values I have:
+#eigenvalues check
 length(dca$evals)
 
 dcal1 <- dca$evals[1]
@@ -310,7 +305,7 @@ dcal4 <- dca$evals[4]
 
 total <- sum(c(dcal1, dcal2, dcal3, dcal4))
 
-#  DCA 1-2-3-4 %
+#DCA 1-2-3-4 %
 percdca1 <- dcal1 * 100 / total
 percdca2 <- dcal2 * 100 / total
 percdca3 <- dcal3 * 100 / total
@@ -322,9 +317,9 @@ percdca2
 percdca3
 percdca4
 
-# DCA1 & DCA2 have the highest %
+#DCA1 & DCA2 have the highest %
 
-#to see where the transects are in the graph
+#transects values in the DCA
 transect_scores <- scores(
   dca,
   display = "sites")
@@ -338,7 +333,7 @@ transect_scores
 transect_names <- fish |>
   distinct(transect, site)
 
-# Put transects in the same order as in the DCA
+#Put transects in the same order as in the DCA
 transect_names <- transect_names[
   match(rownames(transect_scores),transect_names$transect),]
 
@@ -353,7 +348,7 @@ point_colors[transect_names$site %in% "Praia do Populo"] <- "green"
 
 point_colors[transect_names$site %in% "Praia Ribeira das Tainhas"] <- "orange"
 
-# check that there are 5 transects for each site
+#check that there are 5 transects for each site
 table(point_colors)
 
 #set axis
@@ -376,14 +371,14 @@ plot(
   xlab = "DCA1",
   ylab = "DCA2"
 )
-# Lines crossing at zero
+
 abline(
   h = 0,
   v = 0,
   col = "grey",
   lty = 2
 )
-# add transects as coloured points
+
 points(
   transect_scores[, "DCA1"],
   transect_scores[, "DCA2"],
@@ -429,7 +424,7 @@ white_seabream<-fish[fish$fish.species=="white seabream",]
 white_seabream_date<-white_seabream$date
 white_seabream_abundance<-white_seabream$abundances
 
-#selection of dates, species and relative abundances - salema
+#selection of species, date and relative abundances - salema
 salema<-fish[fish$fish.species=="salema",]
 salema_date<-salema$date
 salema_abundance<-salema$abundances
