@@ -548,8 +548,6 @@ E(interactions_graph)$width <-
 strong_interactions <- interactions |>
   arrange(desc(overlap)) |>
   slice_head(n = 10)
-
-knitr::kable(strong_interactions)
 ```
 |big_species      |small_species     |   overlap|
 |:----------------|:-----------------|---------:|
