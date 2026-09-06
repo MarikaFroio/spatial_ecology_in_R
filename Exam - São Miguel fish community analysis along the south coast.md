@@ -44,19 +44,20 @@ setwd("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project")
 ```
 ## packages upload
 ```md
-library("tidyverse")
-# used for data manipulation. it includes "dplyr", also used for data manipulation, and "ggplot2" used for graphs and visualization
+library("dyplr")
+# used for data manipulation. 
 library("lubridate")
 # used to set dates
+library("ggplot2")
+# used for data visualization 
 library("vegan")
 # used for ecological analysis
 library(mapview)
 # used to create interactive maps
-library(overlap)
-# used to analyse temporal and density overlap
 library(igraph)
 # used to analyse species interaction network
 library(terra)
+# used to work with spatial data
 ```
 ## file upload
 ```md
@@ -160,6 +161,8 @@ theme(
 ```
 ![](mean%20abundance%20Rplot.png)
 
+*Figure 1. Mean abundance of fish species in São Miguel south coast*
+
 ## 3. STUDY OF ENDANGERED (Dusky Grouper) AND NEAR THREATENED (Thicklip Grey Mullet) SPECIES DISTRIBUTION
 ```md
 #adding sites coordinates
@@ -243,7 +246,7 @@ map_EN
 ```
 
 ![](duskygrouperRplot.png)
-
+*Figure 2. Presence-absence distribution of juvenile dusky grouper across the study sites.*
 
 ### Thicklip Grey Mullet (NT) presence-absence map
 ```md
@@ -263,8 +266,8 @@ map_NT <- mapview(
 map_NT
 ```
 ![](thicklipgreymullet3Rplot.png)
-
-## 4. DCA on fish community among sites
+*Figure 3. Presence-absence distribution of thicklip grey mullet across the study sites.*
+## 4. DCA ON FISH COMMUNITY AMONG SITES
 ```md
 #  creating transect value
 # site + date = transect
@@ -414,6 +417,7 @@ legend(
 )
 ```
 ![](dcaRplot.png)
+*Figure 4. DCA of the 4 survey sites.*
 
 ## 5. ABUNDANCE CHANGE OVER 5 MONTHS OF THE 2 MOST ABUNDANT SPECIES
 ```md
@@ -439,6 +443,8 @@ plot(salema_date, salema_abundance, xlab = "date", ylab = "abundance", main = "S
 par(mfrow = c(1, 1))
 ```
 ![](abundancedateRplot.png)
+*Figure 5. abundance change over 5 month period for white seabream and salema*
+
 ## 6. DETECTION FREQUENCY ANALYSIS 
 ```md
 # White Seabream
@@ -467,7 +473,9 @@ lines(s_linear_kd, col = "red")
 axis(1, at = pretty(c(wsb_linear_kd$x, s_linear_kd$x)), labels = as.Date(pretty(c(wsb_linear_kd$x, s_linear_kd$x)), origin = "1970-01-01"))
 ```
 ![](kerneldensity2Rplot.png)
-# Loop to check other species detection frequency
+*Figure 6. comparison of white seabream and salema kernel density*
+
+### Loop to check other species detection frequency
 ```md
 species_list <- unique(fish$fish.species)
 
@@ -496,6 +504,7 @@ par(mfrow = c(1, 1))
 ### linear kernel density plots other species recorded at least twice
 ![](densityall1Rplot.png)
 ![](densityall2Rplot.png)
+*Figure 7. species kernel density*
 
 ## 7. COMMUNITY GRAPH TO STUDY POTENTIAL SPATIAL/RESOURCE OVERLAP DEPENDING ON FISH SIZE AND ABUNDANCE
 ```md
@@ -585,3 +594,9 @@ plot(
 ```
 ### community interactions based on fish size plot
 ![](interactionsRplot.png)
+*Figure 8. Species interactions depending on size difference*
+
+### Sitography
+https://earth.google.com/web/@37.75099151,-25.61599655,13.26482041a,3232.01647433d,30.00032882y,0h,0t,0r/data=CgRCAggBOgMKATBCAggASggIgc2A8wQQAA?authuser=0
+https://www.iucnredlist.org/species/7859/44904558
+https://www.iucnredlist.org/species/135689/21910140
