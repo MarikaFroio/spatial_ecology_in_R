@@ -504,7 +504,7 @@ species_size <- fish |>
   select(fish.species, size.cm) |>
   group_by(fish.species) |>
   summarise(
-    mean_size = mean(size.cm, na.rm = TRUE))
+    mean_size = mean(size.cm)
 
 #Creating big and small species categories based on mean size 
 big_species <- species_size |>
