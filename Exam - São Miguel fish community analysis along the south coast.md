@@ -45,13 +45,17 @@ setwd("C:/Users/froio/OneDrive/Desktop/GCE &SDG/R project")
 ## packages upload
 ```md
 library("tidyverse")
+# used for data manipulation. it includes "dplyr", also used for data manipulation, and "ggplot2" used for graphs and visualization
 library("lubridate")
+# used to set dates
 library("vegan")
-library(dplyr)
-library(ggplot2)
+# used for ecological analysis
 library(mapview)
+# used to create interactive maps
 library(overlap)
+# used to analyse temporal and density overlap
 library(igraph)
+# used to analyse species interaction network
 library(terra)
 ```
 ## file upload
@@ -105,7 +109,7 @@ names_sc_richness
 mean_abundance_overall <- fish |>
   group_by(fish.species) |>
   summarise(
-    mean_abundance = mean(abundances, na.rm = TRUE),
+    mean_abundance = mean(abundances),
     .groups = "drop"
   ) |>
   arrange(desc(mean_abundance))
@@ -113,17 +117,17 @@ mean_abundance_overall
 ```
 |fish.species           | mean_abundance|
 |:----------------------|--------------:|
-|salema                 |      38.8|
-|white seabream         |      34.2|
+|salema                 |      38.85|
+|white seabream         |      34.21|
 |bogue                  |      20|
-|two-banded seabream    |       6.1|
+|two-banded seabream    |       6.11|
 |rainbow wrasse         |       3|
 |thicklip grey mullet   |       3|
-|parrotfish             |       2.7|
+|parrotfish             |       2.71|
 |dusky grouper juvenile |       2|
 |saddled seabream       |       2|
-|striped red mullet     |       1|
-|ornate wrasse          |       1.3|
+|striped red mullet     |       1.75|
+|ornate wrasse          |       1.33|
 |axillary wrasse        |       1|
 |blue damselfish        |       1|
 |flounder               |       1|
@@ -183,7 +187,7 @@ names(fish)
 #transforming the dataset into a Spatvector
 fish_vect <- vect(
   fish,
-  geom = c("longitude.y", "latitude.x"),
+  geom = c("longitude", "latitude"),
   crs = "EPSG:4326")
 
 #extracting the 4 sites
@@ -210,10 +214,6 @@ sites$Occurrence_NT[
 ] <- 1
 #check
 sites$Occurrence_NT
-
-#data frame dusky grouper/thicklip grey mullet occurrence
-EN_occurrence_df <- as.data.frame(sites$Occurrence_EN)
-NT_occurrence_df <- as.data.frame(sites$Occurrence_NT)
 
 #presence and absence duskygrouper
 pres_EN <- sites[sites$Occurrence_EN == 1,]
@@ -266,26 +266,22 @@ map_NT
 
 ## 4. DCA on fish community among sites
 ```md
-# exctract values from spatvector
-fish_df <- values(fish_vect)
-
-
 #  creating transect value
 # site + date = transect
-fish_df$transect <- paste(
-  fish_df$site,
-  fish_df$date,
+fish$transect <- paste(
+  fish$site,
+  fish$date,
   sep = "_"
 )
 
 
 # 2d matrix
 # rows = transect
-# columns = specie
-# values = abbondanze
+# columns = species
+# values = abundances
 dca_matrix <- xtabs(
   abundances ~ transect + fish.species,
-  data = fish_df
+  data = fish
 )
 
 
@@ -299,6 +295,9 @@ dim(dca_matrix)
 dca <- decorana(dca_matrix)
 
 #  eigenvalues: they explain how important each DCA axis is when representing the differences in fish composition among sites
+# to check how many values I have:
+length(dca$evals)
+
 dcal1 <- dca$evals[1]
 dcal2 <- dca$evals[2]
 dcal3 <- dca$evals[3]
@@ -306,16 +305,19 @@ dcal4 <- dca$evals[4]
 
 total <- sum(c(dcal1, dcal2, dcal3, dcal4))
 
-#  DCA1 and DCA2 %
+#  DCA 1-2-3-4 %
 percdca1 <- dcal1 * 100 / total
 percdca2 <- dcal2 * 100 / total
+percdca3 <- dcal3 * 100 / total
+percdca4 <- dcal4 * 100 / total
 
 #check
 percdca1
 percdca2
+percdca3
+percdca4
 
-# % DCA1 + DCA2
-percdca1 + percdca2
+# DCA1 & DCA2 have the highest %
 
 #to see where the transects are in the graph
 transect_scores <- scores(
@@ -328,9 +330,8 @@ transect_scores
 ```md
 
 #matching the transect to the site
-transect_names <- unique(
-  fish_df[, c("transect", "site")]
-)
+transect_names <- fish |>
+  distinct(transect, site)
 
 # Put transects in the same order as in the DCA
 transect_names <- transect_names[
@@ -374,7 +375,7 @@ plot(
 abline(
   h = 0,
   v = 0,
-  col = "grey80",
+  col = "grey",
   lty = 2
 )
 # add transects as coloured points
@@ -468,16 +469,15 @@ axis(1, at = pretty(c(wsb_linear_kd$x, s_linear_kd$x)), labels = as.Date(pretty(
 ![](kerneldensity2Rplot.png)
 # Loop to check other species detection frequency
 ```md
-fish_date_numeric <- as.numeric(fish$date)
 species_list <- unique(fish$fish.species)
 
 #plot
 par(mfrow = c(3, 3))
 for (species in species_list) {species_data <- fish[
     fish$fish.species == species,]
-if (nrow(species_data) >= 2) { species_data$date_numeric <- as.numeric(
+if (nrow(species_data) >= 2) { species_data_numeric <- as.numeric(
       species_data$date)
-    linear_kd <- density(species_data$date_numeric)
+    linear_kd <- density(species_data_numeric)
     
     plot(linear_kd,
          main = paste("Kernel density of date for", species),
@@ -487,13 +487,13 @@ if (nrow(species_data) >= 2) { species_data$date_numeric <- as.numeric(
          cex.main = 0.7)
     
     axis(1,
-         at = pretty(species_data$date_numeric),
-         labels = as.Date(pretty(species_data$date_numeric),
+         at = pretty(species_data_numeric),
+         labels = as.Date(pretty(species_data_numeric),
                           origin = "1970-01-01"), cex.axis = 0.7)}}
 # Return to one plot at a time
 par(mfrow = c(1, 1))
 ```
-### linear kernel density plots other speacies recorded at least twice
+### linear kernel density plots other species recorded at least twice
 ![](densityall1Rplot.png)
 ![](densityall2Rplot.png)
 
@@ -501,27 +501,25 @@ par(mfrow = c(1, 1))
 ```md
 #Calculating mean size and mean abundance for each species
 species_size <- fish %>%
-  select(fish.species, size.cm, abundances) %>%
-  group_by(fish.species) %>%
+  select(fish.species, size.cm) |>
+  group_by(fish.species) |>
   summarise(
-    mean_size = mean(size.cm, na.rm = TRUE),
-    mean_abundance = mean(abundances, na.rm = TRUE)
-  )
+    mean_size = mean(size.cm, na.rm = TRUE))
 
 #Creating big and small species categories based on mean size 
-big_species <- species_size %>%
-  filter(mean_size > 15) %>%
+big_species <- species_size |>
+  filter(mean_size > 15) |>
   pull(fish.species)
 
-small_species <- species_size %>%
-  filter(mean_size <= 15) %>%
+small_species <- species_size |>
+  filter(mean_size <= 15) |>
   pull(fish.species)
 
  #Creating interactions between big and small species 
  interactions <- expand.grid(
   big_species = big_species,
-  small_species = small_species
-)
+  small_species = small_species)
+
 #Adding the mean size of the species
 interactions_big_size <- species_size$mean_size[match(interactions$big_species, species_size$fish.species)]
 
@@ -535,18 +533,10 @@ interactions_size_difference <- abs(interactions_big_size - interactions_small_s
 interactions$overlap <- 1 / (1 + interactions_size_difference)
 
 # graph all size + all interactions
-interactions_graph <- graph_from_data_frame(
-  interactions[
-    ,
-    c(
-      "big_species",
-      "small_species",
-      "overlap"
-    )
-  ],
+interactions_graph <- graph_from_data_frame(interactions[,c("big_species","small_species","overlap")],
   vertices = species_size$fish.species,
-  directed = FALSE
-)
+  directed = FALSE)
+
 #nodes size
 V(interactions_graph)$size <- 8
 
@@ -555,22 +545,32 @@ E(interactions_graph)$width <-
   E(interactions_graph)$overlap * 8
 
 #selection of strongest interactions
-strong_interactions <- interactions %>%
-  arrange(desc(overlap)) %>%
+strong_interactions <- interactions |>
+  arrange(desc(overlap)) |>
   slice_head(n = 10)
+
+knitr::kable(strong_interactions)
+```
+|big_species      |small_species     |   overlap|
+|:----------------|:-----------------|---------:|
+|axillary wrasse  |portuguese blenny | 0.4444444|
+|axillary wrasse  |white seabream    | 0.4198895|
+|salema           |portuguese blenny | 0.3939394|
+|salema           |white seabream    | 0.3745262|
+|saddled seabream |portuguese blenny | 0.2857143|
+|saddled seabream |white seabream    | 0.2753623|
+|axillary wrasse  |madeira rockfish  | 0.1739130|
+|garfish          |portuguese blenny | 0.1666667|
+|salema           |madeira rockfish  | 0.1656051|
+|garfish          |white seabream    | 0.1630901|
+
+```md
 #species involved in strongest interactions
-label_species <- unique(
-  c(
-    strong_interactions$big_species,
-    strong_interactions$small_species
-  )
-)
+label_species <- unique(c(strong_interactions$big_species,strong_interactions$small_species))
+
 #show labels
 V(interactions_graph)$label <- ifelse(
-  V(interactions_graph)$name %in% label_species,
-  V(interactions_graph)$name,
-  ""
-)
+  V(interactions_graph)$name %in% label_species, V(interactions_graph)$name,"")
 
 # plot
 plot(
