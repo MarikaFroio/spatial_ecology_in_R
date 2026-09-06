@@ -102,7 +102,7 @@ names_sc_richness
 | 6 |striped red mullet     | 15 |garfish                |
 | 7 |thicklip grey mullet   | 16 |madeira rockfish       |
 | 8 |two-banded seabream    | 17 |ornate wrasse          |
-|9 9|white seabream         | 18 |parrotfish             |
+| 9 |white seabream         | 18 |parrotfish             |
 
 ## 2. STUDY OF MEAN ABUNDANCE OF EACH SPECIES
 ```md
