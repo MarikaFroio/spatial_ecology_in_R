@@ -135,7 +135,7 @@ mean_abundance_overall <- fish |>
     .groups = "drop") |>
   arrange(desc(mean_abundance))
 
-# group_by() is a dplyr function that creates a groups the data based on the species, then summarise() is a dplyr function that creates a result containing mean_abundance which is the mean value of all abundances for each species and then arrange() (dplyr function) orders the result from species with highest to lowest abundance. (MAYBE NA.RM = TRUE COULD BE REMOVED)
+# group_by() is a dplyr function that creates groups from data based on the species, then summarise() is a dplyr function that creates 1 result containing only mean_abundance which is the mean value of all abundances for each species and then arrange(desc()) (dplyr function) orders the result from species with highest to lowest abundance. (MAYBE NA.RM = TRUE COULD BE REMOVED)
 
 mean_abundance_overall
 
