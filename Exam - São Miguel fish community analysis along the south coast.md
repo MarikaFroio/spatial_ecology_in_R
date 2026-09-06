@@ -422,7 +422,7 @@ legend(
 
 *Figure 4. DCA of the 4 survey sites.*
 
-## 5. ABUNDANCE CHANGE OVER 5 MONTHS OF THE 2 MOST ABUNDANT SPECIES
+## 5. ABUNDANCE CHANGE OF THE 2 MOST ABUNDANT SPECIES OVER 5 MONTHS 
 ```md
 #selection of species, dates and relative abundances - white seabream
 white_seabream<-fish[fish$fish.species=="white seabream",]
