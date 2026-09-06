@@ -593,7 +593,6 @@ plot(
   main = "Potential spatial/resource overlap among fish species"
 )
 ```
-### community interactions based on fish size plot
 ![](interactionsRplot.png)
 
 *Figure 8. Species interactions depending on size difference*
