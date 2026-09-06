@@ -500,7 +500,7 @@ par(mfrow = c(1, 1))
 ## 7. COMMUNITY GRAPH TO STUDY POTENTIAL SPATIAL/RESOURCE OVERLAP DEPENDING ON FISH SIZE AND ABUNDANCE
 ```md
 #Calculating mean size and mean abundance for each species
-species_size <- fish %>%
+species_size <- fish |>
   select(fish.species, size.cm) |>
   group_by(fish.species) |>
   summarise(
