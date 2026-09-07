@@ -28,7 +28,7 @@ This study focuses on the southern coast of São Miguel, with the aim of investi
 ---
 
 # Data gathering and Methodology
-Data were collected through snorkeling surveys along 15 m transects, located at approximately the same distance from the coastline, at four different sites along the southern coast of São Miguel: Praia da Pedreira, Praia Ribeira das Tainhas, Praia Baixa d’Areia, and Praia do Pópulo.
+Data were collected through snorkeling surveys along a 15 m transects, located at approximately the same distance from the coastline, at four different sites along the southern coast of São Miguel: Praia da Pedreira, Praia Ribeira das Tainhas, Praia Baixa d’Areia, and Praia do Pópulo.
 
 Sampling was conducted over a five-month period, with a total of five transects for each site.
 For each transect, the data recorded included fish species, relative abundance and body size, as well as the date and time of sampling and a set of environmental variables. 
