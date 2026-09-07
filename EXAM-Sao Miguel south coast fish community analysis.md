@@ -457,7 +457,6 @@ salema_date_numeric<-as.numeric(salema_date)
 s_linear_kd<-density(salema_date_numeric)
 
 # comparison plot
-par(mfrow=c(1,1))
 
 plot(wsb_linear_kd,
       col = "blue",
