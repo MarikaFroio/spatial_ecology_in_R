@@ -84,9 +84,8 @@ fish$time <- hm(fish$time)
 ```
 ## 1. STUDY OF SPECIES RICHNESS
 ```md
-sc_richness <- fish |>
-  summarise(species_richness = n_distinct(fish.species))
-sc_richness
+sc_richness <- n_distinct(fish$fish.species)
+
 # table with species names
 names_sc_richness <- fish |>
   distinct(fish.species) |>
