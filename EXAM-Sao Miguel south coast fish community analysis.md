@@ -548,7 +548,7 @@ interactions_graph <- graph_from_data_frame(interactions[,c("big_species","small
 #nodes size
 V(interactions_graph)$size <- 8
 
-#edge thickness base on overlap
+#edge thickness based on overlap
 E(interactions_graph)$width <-
   E(interactions_graph)$overlap * 8
 
