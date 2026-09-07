@@ -23,7 +23,7 @@ This study focuses on the southern coast of São Miguel, with the aim of investi
 - **Species distribution**, with a focus on species classified as *Endangered* or *Near Threatened* according to the IUCN Red List
 - **Temporal variation in species abundance** in relation to sampling date over a five-month period
 - **Detection patterns**, using kernel density estimation to identify periods with the highest frequency of fish detections
-- **Potential indirect interactions**, exploring competition for space among species in     relation to body size and the spatial area they occupy
+- **Potential indirect interactions**, exploring competition for space among species in  relation to body size and the spatial area they occupy
 
 ---
 
@@ -505,7 +505,7 @@ par(mfrow = c(1, 1))
 
 *Figure 7. species kernel density*
 
-## 7. COMMUNITY GRAPH TO STUDY POTENTIAL SPATIAL/RESOURCE OVERLAP DEPENDING ON FISH SIZE AND ABUNDANCE
+## 7. COMMUNITY GRAPH TO STUDY POTENTIAL SPATIAL/RESOURCE OVERLAP DEPENDING ON FISH SIZE
 ```md
 #Calculating mean size and mean abundance for each species
 species_size <- fish |>
