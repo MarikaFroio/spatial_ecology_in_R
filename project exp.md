@@ -166,8 +166,9 @@ knitr::kable(mean_abundance_overall)
 ```md
 ggplot(mean_abundance_overall,
     aes(x = "abundance",y = reorder(fish.species, mean_abundance),
+# aes tells ggplot which variables to used to create the graph
 # y=rorder... is a basic R function that puts species on the y axis and orders them based on their mean abundance
-    fill = mean_abundance))
+   + fill = mean_abundance))
 # fill means that the color of the tile depends on the mean abundance (and creates the gradient on the side)
  +
 geom_tile(color = "white")
@@ -177,7 +178,7 @@ geom_tile(color = "white")
 geom_text(
     aes(label = round(mean_abundance, 2)),
 # round (mean...) is a basic R function that rounds to 2 decimals, could be label=mean_abundance
-    color = "black",
+   + color = "black",
     size = 3.5) +
 scale_fill_gradient(low = "yellow", high = "orange")
 # scale_fill-gradient is a ggplot2 function that assigns a color to low and high values +
@@ -218,7 +219,7 @@ coordinates <- data.frame(
     -25.4096397,
     -25.5179964,
     -25.6157604))
-# all basic R functions. we create a data frame so we can have an organized table with associations already made and it will be easier to merge it with the fish data frame. c() creates a vector of values. latitude and longitude values are taken from google earth. 
+# all basic R functions. data.frame creates a new dataframe, as.data.frame transforms and already existing object into a dataframe. we create a data frame so we can have an organized table with associations already made and it will be easier to merge it with the fish data frame. c() creates a vector of values. latitude and longitude values are taken from google earth. 
 
 #combining dataset and coordinates
 fish <- merge(fish, coordinates, by = "site")
@@ -233,6 +234,7 @@ fish_vect <- vect(
   fish,
   geom = c("longitude.y", "latitude.x"),
   crs = "EPSG:4326")
+# NO MORE .Y AND .X
 # vect() is a terra function that transforms the dataframe fish into a SpatVector, which is still a dataframe but with spatial characteristics.
 # geom() is an argument of vect (to check I could do args(vect)), it stands for geometry and is used to tell vect() which columns to use as coordinates
 # crs is another vect() argument which specifies the geographic reference system. it corresponds to WGS 84 coordinates (World Geodetic System 1984), used to express a location on earth in latitude and longitude. I know that i have to use "EPSG:4326" because it is the code associated for WGS 84 and google earth uses this kind.
@@ -248,7 +250,8 @@ sites <- fish_vect[!duplicated(fish_vect$site), ]
 #choosing 1st species
 EN_sites <- unique(
   fish_vect$site[fish_vect$fish.species == "dusky grouper juvenile "])
-# i am creating just a vector with the names of the sites where I recored the species so I can use the basic function of R unique() which gives me the different names jsut 1 time
+# == means "if"
+# i am creating just a vector with the names of the sites where I recored the species so I can use the basic function of R unique() which gives me the different names just 1 time
 # inside unique I put only the column site of the spatvector fish_vect
 # and I select only the data related to the species I want in the column fish.species of the spatvector fish_vect
 
@@ -317,7 +320,7 @@ map_EN <- mapview(
     layer.name = "Dusky grouper juvenile - Absence"
 )
 # mapview() is a function of the mapview package that represents an object on a map.
-# we are representing sites: the rows are the presences and absences and the columns are sites and occurrence
+# we are representing sites: the rows are the presences and absences and the columns are sites and occurrence, which are the only columns we are interested in
 # col.regions is a mapview argument that assigns a color to certain point or regions on the map
 # layer.name is a mapview argument that gives a name to the layer of the map
 
